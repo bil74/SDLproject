@@ -1,7 +1,14 @@
 #ifndef _SDLPARTS_H_
 #define _SDLPARTS_H_
+#ifndef _LINUX_
 #include <SDL.h>
 #include <SDL_TTF.h>
+#else
+//#include <SDL/SDL.h>
+//#include <SDL2/SDL_ttf.h>
+#include </usr/include/SDL2/SDL.h>
+#include </usr/include/SDL2/SDL_ttf.h>
+#endif
 
 //public variables
 

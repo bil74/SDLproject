@@ -1,10 +1,15 @@
+#ifndef _LINUX_
 using namespace std;
-
 #include <iostream>
-#include <math.h>
-#include <time.h>
 #include <windows.h>
 #include <SDL.h>
+#else
+#include <unistd.h>
+//#include <SDL/SDL.h>
+#include <inttypes.h>
+#endif
+#include <math.h>
+#include <time.h>
 #include "timer.h"
 #include "sdlparts.h"
 #include "Source.h"
@@ -20,10 +25,15 @@ extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 
 //timers
+#ifndef _LINUX_
 __int64 timer_main = 0;
 __int64 timer_refr_txt = 0;
 __int64 timer_frame = 0;
-
+#else
+int64_t timer_main = 0;
+int64_t timer_refr_txt = 0;
+int64_t timer_frame = 0;
+#endif
 
 //cube object v2
 t_point3d cube_points_3d[8] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },  /**/  
@@ -72,7 +82,7 @@ int sizeof_segment3d = 16000;	//mondjuk
 
 
 t_camera camera = {
-	0,-0,-500,0,0,0
+	0,0,-500,0,0,0
 };
 
 
@@ -103,12 +113,9 @@ void getkeys(void);
 SDL_bool done_global = SDL_FALSE;
 
 
-
-
-
-
 int main(int argc, char* argv[])
 {
+
 	if (init_some_stuff() != 0) {
 		printf("init failed!\n");
 		return -1;
@@ -122,7 +129,6 @@ int main(int argc, char* argv[])
 			{
 				//SDL_Event event;
 				setup_screen();
-
 
 				//draw to the screen
 
@@ -143,7 +149,6 @@ int main(int argc, char* argv[])
 
 void getkeys(void) {
 	//fill keytable
-	static bool akarmi;
 	enum keys {
 		key_up,
 		key_down,
@@ -158,7 +163,11 @@ void movement(void) {
 
 void move_camera(void) {
 #define MILLIS_PER_SEC 1000.00
+#ifndef _LINUX_
 	static __int64 timer_move;
+#else
+	static int64_t timer_move;
+#endif
 	const double speed_cam_move = 600;			//pixel per sec
 	const double speed_cam_rot = 90;			//degree per sec
 	double frametime;							//
@@ -189,10 +198,11 @@ void move_camera(void) {
 		camera.z -= (cos(camera.roty*val) * (frametime*speed_cam_move));
 		camera.x -= (sin(camera.roty*val) * (frametime*speed_cam_move));
 	}
-	if (keystates[SDL_SCANCODE_ESCAPE])
+	if (keystates[SDL_SCANCODE_ESCAPE]) {
 		done_global = SDL_TRUE;
+	}
 
-		StartCounter(&timer_move);
+	StartCounter(&timer_move);
 
 
 }
@@ -256,6 +266,9 @@ void render_scene_v2(t_scene *scene_rsv2)
 	draw2d_v2(scene_rsv2);
 	//render cycle end
 
+	//printf("render scene v2 math done!\n");
+	//return;
+
 	num_of_frames++;
 	//refresh frametime value
 	if (GetCounter(&timer_refr_txt) > DSPTIME) {
@@ -267,12 +280,24 @@ void render_scene_v2(t_scene *scene_rsv2)
 
 	//print some stuff to the screen
 	//camera data
+
+#ifndef _LINUX_
 	sprintf_s(text2print, sizeof(text2print), "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
+#else
+	sprintf(text2print, "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
+#endif
 	display_text(0, 0, text2print);
+
 	//fps
 	//sprintf_s(text2print, sizeof(text2print), "fps %d", (int)roundf((float)(1000.00 / frametime)));	//int
+#ifndef _LINUX_
 	sprintf_s(text2print, sizeof(text2print), "fps %.2f", (float)(1000.00 / frametime));				//float
+#else
+	sprintf(text2print, "fps %.2f", (float)(1000.00 / frametime));				//float
+#endif
 	display_text(0, 1, text2print);
+
+
 }
 
 
@@ -392,7 +417,7 @@ int create_lot_cubes_v2(void)
 	//t_poly *cube_polyconns;
 	int num_objects = 1;
 	int rand_x, rand_y, rand_z;
-	#define MAXDISTANCE_V2 (BLOCKSIZE_V2 * DISTANCE_V2 * 2)
+	#define MAXDISTANCE_V2 (BLOCKSIZE_V2 * DISTANCE_V2 * 2 + CUBES_V2)
 
 	//randomnumber = rand() % MAXDISTANCE;
 	for (k = 1; k < CUBES_V2; k++) {
@@ -492,11 +517,19 @@ void render_scene(void)
 
 	//print some stuff to the screen
 	//camera data
+#ifndef _LINUX_
 	sprintf_s(text2print, sizeof(text2print), "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
+#else
+	sprintf(text2print, "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
+#endif
 	display_text(0, 0, text2print);
 	//fps
 	//sprintf_s(text2print, sizeof(text2print), "fps %d", (int)roundf((float)(1000.00 / frametime)));
+#ifndef _LINUX_
 	sprintf_s(text2print, sizeof(text2print), "fps %.2f", (float)(1000.00 / frametime));
+#else
+	sprintf(text2print, "fps %.2f", (float)(1000.00 / frametime));
+#endif
 	display_text(0, 1, text2print);
 }
 

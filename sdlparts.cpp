@@ -1,6 +1,8 @@
+#ifndef _LINUX_
+#include <windows.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
 #include "timer.h"
 #include "sdlparts.h"
 
@@ -9,19 +11,21 @@ extern SDL_Window* window = NULL;
 extern SDL_Renderer* renderer = NULL;
 int screen_res_x = 640;
 int screen_res_y = 480;
-const char *font_file = { "C:\\Windows\\Fonts\\lucon.ttf" };
+//const char *font_file = { "C:\\Windows\\Fonts\\lucon.ttf" };
+const char *font_file = { "Vera.ttf" };
+//const char *font_file = { "lucon.ttf" };
 TTF_Font *ttf_Font; //this opens a font style and sets a size
 SDL_Color ttf_FColor;  // foreground color
 SDL_Color ttf_BColor;  // background color
 
 
 //local functions
-void ttf_init_setup(char *font_fname);
+int ttf_init_setup(char *font_fname);
 
 int sdl_open(void) {
 	//init sdl
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		printf(__FUNCTION__ " SDL_Init failed: %s\n", SDL_GetError());
+		printf(" SDL_Init failed: %s\n", SDL_GetError());
 		return -1;
 	}
 
@@ -51,7 +55,10 @@ int sdl_open(void) {
 		printf("TTF_Init failed!\n");
 		return -1;
 	}
-	ttf_init_setup((char *)font_file);
+	if (ttf_init_setup((char *)font_file) == -1) {
+	    printf("TTF load font \"%s\" failed!\n",(char *)font_file);
+	    return -1;
+	}
 	return 0;
 }
 
@@ -78,11 +85,15 @@ void display_screen(void) {
 	SDL_RenderPresent(renderer);
 }
 
-void ttf_init_setup(char *font_file) {
+int ttf_init_setup(char *font_file) {
 	//set defaults
 	ttf_Font = TTF_OpenFont(font_file, 24); //this opens a font style and sets a size
 	ttf_FColor = { 255, 162, 0, SDL_ALPHA_OPAQUE };  // foreground color
 	ttf_BColor = { 0, 0, 0, SDL_ALPHA_OPAQUE };  // background color
+	if (ttf_Font == NULL) {
+	    return -1;
+	}
+	return 0;
 
 }
 
