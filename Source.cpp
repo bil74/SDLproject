@@ -25,15 +25,9 @@ extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 
 //timers
-#ifndef _LINUX_
-__int64 timer_main = 0;
-__int64 timer_refr_txt = 0;
-__int64 timer_frame = 0;
-#else
-int64_t timer_main = 0;
-int64_t timer_refr_txt = 0;
-int64_t timer_frame = 0;
-#endif
+INT64 timer_main = 0;
+INT64 timer_refr_txt = 0;
+INT64 timer_frame = 0;
 
 //cube object v2
 t_point3d cube_points_3d[8] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },  /**/  
@@ -51,6 +45,8 @@ t_scene scene = {
 	CUBES_V2,
 	objs_v2
 };
+
+
 
 //cube object v1
 t_poly3d cube3d[2 * 6 * CUBES] = {
@@ -75,17 +71,18 @@ t_poly3d cube3d[2 * 6 * CUBES] = {
 
 t_poly3d cube3d_1[2 * 6 * CUBES] = {0};
 
-t_poly2d cube2d[2 * 6 * CUBES] = { 0 };		//work on this magic number!
+t_poly2d cube2d[2 * 6 * CUBES] = { 0 };
 
 //not used
 int sizeof_segment3d = 16000;	//mondjuk
 
 
 t_camera camera = {
-	0,0,-500,0,0,0
+	0,0,-1500, 0,0,0,  0, {0,0,0}, {0,0,1}
 };
 
-
+double sindeg[360+1];
+double cosdeg[360+1];
 
 
 int init_some_stuff(void);
@@ -111,6 +108,8 @@ void getkeys(void);
 
 
 SDL_bool done_global = SDL_FALSE;
+SDL_bool dbg_global = SDL_FALSE;
+
 
 
 int main(int argc, char* argv[])
@@ -168,40 +167,78 @@ void move_camera(void) {
 #else
 	static int64_t timer_move;
 #endif
-	const double speed_cam_move = 600;			//pixel per sec
+	const double speed_cam_move = 1000;			//pixel per sec
 	const double speed_cam_rot = 90;			//degree per sec
 	double frametime;							//
 	double val;
 	val = PI / 180;
 	const Uint8 *keystates = SDL_GetKeyboardState(NULL);	//get key states
+	double rot_step;										//rotation step in degree
+	double tx = camera.uvect.vx;
+	double ty = camera.uvect.vy;
+	double tz = camera.uvect.vz;
 
 	frametime = GetCounter(&timer_move) / MILLIS_PER_SEC;
 	getkeys();	//later
 
+	rot_step = frametime * speed_cam_rot;
 	SDL_PumpEvents();	//actualize events
 
-	if (keystates[SDL_SCANCODE_LEFT]) {
-		camera.roty -= frametime * speed_cam_rot;	//% 360
-		if (camera.roty < 0)
-			camera.roty += 360;
-	}
-	if (keystates[SDL_SCANCODE_RIGHT]) {
-		camera.roty += frametime * speed_cam_rot;	//% 360
-		if (camera.roty > 360)
-			camera.roty -= 360;
+	//use camera unit vectors
+
+
+	if (keystates[SDL_SCANCODE_RIGHT] || keystates[SDL_SCANCODE_LEFT]) {
+		if (keystates[SDL_SCANCODE_RIGHT]) {
+			camera.roty += rot_step;	//% 360
+			if (camera.roty > 360)
+				camera.roty -= 360;
+
+		}
+
+		if (keystates[SDL_SCANCODE_LEFT]) {
+			rot_step = -rot_step;
+			camera.roty += rot_step;	//% 360
+			if (camera.roty < 0)
+				camera.roty += 360;
+		}
+
+		//computing camera unit vector based on steps
+		//camera.uvect.vx = (cos(rot_step*val) * tx) + (sin(rot_step*val) * tz);
+		//camera.uvect.vz = (cos(rot_step*val) * tz) - (sin(rot_step*val) * tx);
+		
+		//computing camera unit vector based on default camera unit vector
+		camera.uvect.vx = (cos(camera.roty*val) * camera.uvect_default.vx) + (sin(camera.roty*val) * camera.uvect_default.vz);
+		camera.uvect.vz = (cos(camera.roty*val) * camera.uvect_default.vz) - (sin(camera.roty*val) * camera.uvect_default.vx);
 	}
 	if (keystates[SDL_SCANCODE_UP]) {
+		//working with degrees of camera
+		/*
 		camera.z += (cos(camera.roty*val) * (frametime*speed_cam_move));
 		camera.x += (sin(camera.roty*val) * (frametime*speed_cam_move));
+		*/
+		//working with unit vector of camera
+		camera.z += (camera.uvect.vz * (frametime*speed_cam_move));
+		camera.x += (camera.uvect.vx * (frametime*speed_cam_move));
 	}
 	if (keystates[SDL_SCANCODE_DOWN]) {
+		/*
 		camera.z -= (cos(camera.roty*val) * (frametime*speed_cam_move));
 		camera.x -= (sin(camera.roty*val) * (frametime*speed_cam_move));
+		*/
+
+		camera.z -= (camera.uvect.vz * (frametime*speed_cam_move));
+		camera.x -= (camera.uvect.vx * (frametime*speed_cam_move));
 	}
 	if (keystates[SDL_SCANCODE_ESCAPE]) {
 		done_global = SDL_TRUE;
 	}
-
+	//debug stuff
+	if (keystates[SDL_SCANCODE_RETURN]) {
+		dbg_global = SDL_TRUE;
+	}
+	else
+		dbg_global = SDL_FALSE;
+	
 	StartCounter(&timer_move);
 
 
@@ -211,6 +248,7 @@ void move_camera(void) {
 
 int init_some_stuff(void)
 {
+
 	//init sdl
 	if (sdl_open() != 0)
 		return -1;
@@ -230,9 +268,16 @@ int init_some_stuff(void)
 	StartCounter(&timer_main);
 
 	
+	{
+		//fill sin-cos tables
+		int i;
+		double val = PI / 180;
 
-
-
+		for (i = 0; i <= 360; i++) {
+			sindeg[i] = sin(i*val);
+			cosdeg[i] = cos(i*val);
+		}
+	}
 	
 	
 	return 0;
@@ -298,6 +343,16 @@ void render_scene_v2(t_scene *scene_rsv2)
 	display_text(0, 1, text2print);
 
 
+	//OTHER
+	//sprintf_s(text2print, sizeof(text2print), "fps %d", (int)roundf((float)(1000.00 / frametime)));	//int
+#ifndef _LINUX_
+	sprintf_s(text2print, sizeof(text2print), "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
+#else
+	sprintf(text2print, "fps %.2f", (float)(1000.00 / frametime));				//float
+#endif
+	display_text(0, 2, text2print);
+
+
 }
 
 
@@ -309,33 +364,42 @@ void do_3d_to_2d(t_scene *scene_3to2v2) {
 	double val;
 	val = PI / 180;
 	const int persp_value = 500;
+	int x, y, z, tx, ty, tz;	//temporary values
+	double cx = cos(camera.rotx*val);
+	double sx = sin(camera.rotx*val);
+	double cy = cos(camera.roty*val);
+	double sy = sin(camera.roty*val);
+	double cz = cos(camera.rotz*val);
+	double sz = sin(camera.rotz*val);
 
+	//TODO: use camera unit vectors to determine rotations?
+	//get cam rot vals from its unit vector
+	//int camrot_x, camrot_y, camrot_z;
+	//camrot_y = asin(camera.uvect. ) * val;
 	
-	//1 object
-	for (i = 0; i < scene_3to2v2->num_objects; i++) {
-		for (j = 0; j < scene_3to2v2->objects[i].num_points; j++) {
-			int x, y, z, tx, ty, tz;	//temporary values
+	for (i = 0; i < scene_3to2v2->num_objects; i++) {					//all objects
+		for (j = 0; j < scene_3to2v2->objects[i].num_points; j++) {		//1 object
 
 			//apply camera position
 			x = scene_3to2v2->objects[i].points_3d[j].x - (int)camera.x;
 			y = scene_3to2v2->objects[i].points_3d[j].y - (int)camera.y;
 			z = scene_3to2v2->objects[i].points_3d[j].z - (int)camera.z;
-			//printf("do_3d_to_2d x:%d, y:%d, z:%d", x, y, z);
 
 			//apply camera rotation
-			//y axis
+			// ******************* y axis
 			tx = x; tz = z;
-			x = (int)((cos(camera.roty*val) * tx) - (sin(camera.roty*val) * tz));
-			z = (int)((cos(camera.roty*val) * tz) + (sin(camera.roty*val) * tx));
-			//x axis
+			x = (int)((cy * tx) - (sy * tz));
+			z = (int)((cy * tz) + (sy * tx));
+
+			// ******************* x axis
 			ty = y; tz = z;
-			z = (int)((cos(camera.rotx*val) * tz) - (sin(camera.rotx*val) * ty));	//talan -
-			y = (int)((cos(camera.rotx*val) * ty) + (sin(camera.rotx*val) * tz));	//talan +
-			//z axis
+			z = (int)((cx * tz) - (sx * ty));
+			y = (int)((cx * ty) + (sx * tz));
+
+			// ******************* z axis
 			ty = y; tx = x;
-			x = (int)((cos(camera.rotz*val) * tx) - (sin(camera.rotz*val) * ty));	//talan -
-			y = (int)((cos(camera.rotz*val) * ty) + (sin(camera.rotz*val) * tx));	//talan +
-			//printf("; trans x:%d, y:%d, z:%d", x, y, z);
+			x = (int)((cz * tx) - (sz * ty));
+			y = (int)((cz * ty) + (sz * tx));
 
 			//transform 3d to 2d
 			if (z <= 0)
@@ -350,7 +414,7 @@ void do_3d_to_2d(t_scene *scene_3to2v2) {
 			}
 
 		}	
-
+		//break;
 	}
 
 }

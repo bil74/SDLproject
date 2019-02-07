@@ -6,14 +6,13 @@
 
 // public functions
 #ifndef _LINUX_
-extern void InitTimer(void);	//call once on start app
-extern void StartCounter(__int64 *timer);	//
-extern double GetCounter(__int64 *timer);
+#define INT64 __int64
 #else
-extern void InitTimer(void);	//call once on start app
-extern void StartCounter(int64_t *timer);	//
-extern double GetCounter(int64_t *timer);
+#define INT64 int64_t
 #endif
+extern void InitTimer(void);	//call once on start app
+extern void StartCounter(INT64 *timer);	//
+extern double GetCounter(INT64 *timer);
 //static functions
 
 #endif //_TIMER_H_

@@ -21,7 +21,6 @@ extern void sdl_close(void);
 extern void setup_screen(void);
 extern void display_screen(void);
 void display_text(int screen_x, int screen_y, char *text2disp);
-void display_text_init();
 
 /*
 extern void InitTimer(void);	//call once on start app

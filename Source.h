@@ -2,14 +2,24 @@
 #ifndef _SOURCE_H_
 #define _SOURCE_H_
 
+
+//unit vector
+typedef struct t_vector {
+	double vx;
+	double vy;
+	double vz;
+}t_vector;
+
 typedef struct {
-	double x;
+	double x;		//position
 	double y;
 	double z;
-	double roty;//-180 -> +180 ?
+	double roty;	//rotation in degree (0-360)
 	double rotx;
 	double rotz;
 	double curr_segment_3d;		//felosztjuk a teret kockákra és csak az akuális plusz szomszédos szegmenseket rajzoljuk meg
+	t_vector uvect;	//unit vector
+	t_vector uvect_default;	//unit vector default
 }t_camera;
 
 typedef struct {
