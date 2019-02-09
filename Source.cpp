@@ -33,12 +33,12 @@ INT64 timer_frame = 0;
 t_point3d cube_points_3d[8] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },  /**/  
 								{ -100, -100,  100 }, { -100, 100,  100 }, { 100, 100,  100 }, { 100, -100,  100 } };
 t_point2d cube_points_2d[8] = {0};
-t_poly cube_polyconns[2 * 6] = { { 0,1,2 ,0,1 }, { 2,3,0 ,0,1},   { 6,5,4 ,0,1}, { 4,7,6 ,0,1},   
-								{ 2,6,7 ,0,1}, { 3,2,7 ,0,1},  { 4,5,1 ,0,1}, { 1,0,4 ,0,1},    //OK
-								{ 5,6,2 ,0,1}, { 2,1,5 ,0,1},    { 3,7,4 ,0,1}, { 4,0,3 ,0,1} };
+t_poly cube_polys[2 * 6] = { { 0,1,2 ,0,0, {0,0,0}}, { 2,3,0 ,0,0,{ 0,0,0 } },  { 6,5,4 ,0,0,{ 0,0,0 } }, { 4,7,6 ,0,0,{ 0,0,0 } },
+							{ 2,6,7 ,0,0, { 0,0,0 } }, { 3,2,7 ,0,0,{ 0,0,0 } },  { 4,5,1 ,0,0,{ 0,0,0 } }, { 1,0,4 ,0,0,{ 0,0,0 } },
+							{ 5,6,2 ,0,0,{ 0,0,0 } }, { 2,1,5 ,0,0,{ 0,0,0 } },  { 3,7,4 ,0,0,{ 0,0,0 } }, { 4,0,3 ,0,0,{ 0,0,0 } } };
 
 t_obj objs_v2[CUBES_V2] = {
-{8, 2 * 6, cube_points_3d, cube_points_2d, cube_polyconns}
+{8, 2 * 6, cube_points_3d, cube_points_2d, cube_polys}
 };
 
 t_scene scene = {
@@ -78,12 +78,13 @@ int sizeof_segment3d = 16000;	//mondjuk
 
 
 t_camera camera = {
-	0,0,-1500, 0,0,0,  0, {0,0,0}, {0,0,1}
+	0,0,-1500, 0,0,0,  0, {0,0,1}, {0,0,1}
 };
 
 double sindeg[360+1];
 double cosdeg[360+1];
 
+void testing(void);
 
 int init_some_stuff(void);
 void close_some_stuff(void);
@@ -99,7 +100,10 @@ void draw2d(void);
 int create_lot_cubes_v2(void);
 void render_scene_v2(t_scene *scene);
 void do_3d_to_2d(t_scene *scene);
-void draw2d_v2(t_scene *scene);
+int draw2d_v2(t_scene *scene);
+t_vector vector_unitize(t_vector input);
+t_vector vector_crossprod(t_vector inputv1, t_vector inputv2);
+double vector_dotprod(t_vector inputv1, t_vector inputv2);
 
 void movement(void);
 void move_camera(void);
@@ -114,6 +118,10 @@ SDL_bool dbg_global = SDL_FALSE;
 
 int main(int argc, char* argv[])
 {
+	/*
+	testing();
+	return 0;
+	*/
 
 	if (init_some_stuff() != 0) {
 		printf("init failed!\n");
@@ -229,6 +237,15 @@ void move_camera(void) {
 		camera.z -= (camera.uvect.vz * (frametime*speed_cam_move));
 		camera.x -= (camera.uvect.vx * (frametime*speed_cam_move));
 	}
+
+	if (keystates[SDL_SCANCODE_W]) {
+		camera.y += (frametime*speed_cam_move);
+	}
+	if (keystates[SDL_SCANCODE_S]) {
+		camera.y -= (frametime*speed_cam_move);
+	}
+
+
 	if (keystates[SDL_SCANCODE_ESCAPE]) {
 		done_global = SDL_TRUE;
 	}
@@ -261,15 +278,17 @@ int init_some_stuff(void)
 	if (create_lot_cubes_v2() == -1)
 		return -1;
 	
+	
 
 	//init timer
 	InitTimer();
 	StartCounter(&timer_frame);
 	StartCounter(&timer_main);
 
-	
+
+	//fill sin-cos tables
+	if (0)	//not used at this time
 	{
-		//fill sin-cos tables
 		int i;
 		double val = PI / 180;
 
@@ -279,7 +298,59 @@ int init_some_stuff(void)
 		}
 	}
 	
-	
+	//calculate normal vectors of initial object
+	//don't forget to duplicate them in create_lot_cubes_v2!!!
+	{
+		int i, j;
+		double ax,ay,az, bx,by,bz, cx,cy,cz;
+		t_vector vect1, vect2, crossvect, normvect;
+		for (j = 0; j < scene.num_objects; j++) {
+			for (i = 0; i < scene.objects[j].num_polys; i++) {
+				//fill 3 point's coordinates
+				ax = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[0]].x;
+				ay = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[0]].y;
+				az = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[0]].z;
+
+				bx = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[1]].x;
+				by = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[1]].y;
+				bz = scene.objects[0].points_3d[scene.objects[0].polys[i].point_id[1]].z;
+
+				cx = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[2]].x;
+				cy = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[2]].y;
+				cz = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[2]].z;
+
+				vect1.vx = bx - ax;
+				vect1.vy = by - ay;
+				vect1.vz = bz - az;
+
+				vect2.vx = cx - bx;
+				vect2.vy = cy - by;
+				vect2.vz = cz - bz;
+
+				crossvect = vector_crossprod(vect1, vect2);
+				normvect = vector_unitize(crossvect);
+
+				if (normvect.vx == -0)
+					normvect.vx = 0;
+				if (normvect.vy == -0)
+					normvect.vy = 0;
+				if (normvect.vz == -0)
+					normvect.vz = 0;
+
+				scene.objects[j].polys[i].uvect_normal.vx = normvect.vx;
+				scene.objects[j].polys[i].uvect_normal.vy = normvect.vy;
+				scene.objects[j].polys[i].uvect_normal.vz = normvect.vz;
+
+				if (0) {	//testing
+					printf("poly %2d: (%d,%d,%d), (%d,%d,%d), (%d,%d,%d)\n", i, (int)ax, (int)ay, (int)az, (int)bx, (int)by, (int)bz, (int)cx, (int)cy, (int)cz);
+					//printf("poly %2d: crossvect.vx=%f, crossvect.vy=%f, crossvect.vz=%f\n", i, crossvect.vx, crossvect.vy, crossvect.vz);
+					printf("poly %2d: normvect.vx=%f, normvect.vy=%f, normvect.vz=%f\n", i, normvect.vx, normvect.vy, normvect.vz);
+					printf("\n");
+				}
+
+			}
+		}
+	}
 	return 0;
 }
 
@@ -303,12 +374,26 @@ void render_scene_v2(t_scene *scene_rsv2)
 	static double frametime, sleeptime;
 	char text2print[100];
 	static int num_of_frames;
+	int polycount;
+	int i, j;
 
 
 
 	//render cycle start
 	do_3d_to_2d(scene_rsv2);
-	draw2d_v2(scene_rsv2);
+
+	for (i = 0; i < scene_rsv2->num_objects; i++) {
+		for (j = 0; j < scene_rsv2->objects[i].num_polys; j++) {
+			if (0 && dbg_global == SDL_TRUE) {
+				//printf("object %d | poly %d | vect2poly (%.2f,%.2f,%.2f), normal (%.2f,%.2f,%.2f), dotprod %.2f\n", i, j, vect2poly.vx, vect2poly.vy, vect2poly.vz, normal.vx, normal.vy, normal.vz, dotprod);
+				printf("object %d | poly %2d | drawit %s\n", i, j, scene_rsv2->objects[i].polys[j].draw_it ? "true " : "false");
+			}
+		}
+		if (0 && dbg_global == SDL_TRUE)
+			printf("\n");
+	}
+
+	polycount = draw2d_v2(scene_rsv2);
 	//render cycle end
 
 	//printf("render scene v2 math done!\n");
@@ -336,9 +421,9 @@ void render_scene_v2(t_scene *scene_rsv2)
 	//fps
 	//sprintf_s(text2print, sizeof(text2print), "fps %d", (int)roundf((float)(1000.00 / frametime)));	//int
 #ifndef _LINUX_
-	sprintf_s(text2print, sizeof(text2print), "fps %.2f", (float)(1000.00 / frametime));				//float
+	sprintf_s(text2print, sizeof(text2print), "fps: %.2f, cubes: %d, polys drawn: %d", (float)(1000.00 / frametime), CUBES_V2, polycount);				//float
 #else
-	sprintf(text2print, "fps %.2f", (float)(1000.00 / frametime));				//float
+	sprintf(text2print, "fps: %.2f, cubes: %d, polys drawn: %d", (float)(1000.00 / frametime), CUBES_V2, polycount);				//float
 #endif
 	display_text(0, 1, text2print);
 
@@ -348,7 +433,7 @@ void render_scene_v2(t_scene *scene_rsv2)
 #ifndef _LINUX_
 	sprintf_s(text2print, sizeof(text2print), "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
 #else
-	sprintf(text2print, "fps %.2f", (float)(1000.00 / frametime));				//float
+	sprintf(text2print, "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
 #endif
 	display_text(0, 2, text2print);
 
@@ -359,18 +444,22 @@ void render_scene_v2(t_scene *scene_rsv2)
 
 
 void do_3d_to_2d(t_scene *scene_3to2v2) {
-
 	int i, j;
 	double val;
 	val = PI / 180;
 	const int persp_value = 500;
-	int x, y, z, tx, ty, tz;	//temporary values
+	double x, y, z, tx, ty, tz;	//temporary values
 	double cx = cos(camera.rotx*val);
 	double sx = sin(camera.rotx*val);
 	double cy = cos(camera.roty*val);
 	double sy = sin(camera.roty*val);
 	double cz = cos(camera.rotz*val);
 	double sz = sin(camera.rotz*val);
+	
+	//backface culling
+	t_poly tmpoly;
+	t_vector vect2poly, normal;
+	double dotprod;
 
 	//TODO: use camera unit vectors to determine rotations?
 	//get cam rot vals from its unit vector
@@ -378,8 +467,9 @@ void do_3d_to_2d(t_scene *scene_3to2v2) {
 	//camrot_y = asin(camera.uvect. ) * val;
 	
 	for (i = 0; i < scene_3to2v2->num_objects; i++) {					//all objects
-		for (j = 0; j < scene_3to2v2->objects[i].num_points; j++) {		//1 object
 
+
+		for (j = 0; j < scene_3to2v2->objects[i].num_points; j++) {		//1 object pontjai
 			//apply camera position
 			x = scene_3to2v2->objects[i].points_3d[j].x - (int)camera.x;
 			y = scene_3to2v2->objects[i].points_3d[j].y - (int)camera.y;
@@ -407,14 +497,43 @@ void do_3d_to_2d(t_scene *scene_3to2v2) {
 			else {
 				//transform 3d to 2d
 				scene_3to2v2->objects[i].points_2d[j].valid = true;
-				scene_3to2v2->objects[i].points_2d[j].x = (x * persp_value) / z;
-				scene_3to2v2->objects[i].points_2d[j].y = (y * persp_value) / z;
+				scene_3to2v2->objects[i].points_2d[j].x = (int)((x * persp_value) / z);
+				scene_3to2v2->objects[i].points_2d[j].y = (int)((y * persp_value) / z);
 				//printf("; 2d x:%d, y:%d (z:%d)\n", scene_3to2v2->objects[0].points_2d[j].x, scene_3to2v2->objects[0].points_2d[j].y, z);
 
 			}
 
-		}	
-		//break;
+		}	//3d to 2d transform OK (for one object)
+
+		
+		//visibility (backface culling) for polygons
+		for (j = 0; j < scene_3to2v2->objects[i].num_polys; j++) {		//1 object poligonjai
+			
+			//retrieve poly data
+			tmpoly = scene_3to2v2->objects[i].polys[j];
+
+			//face normal vector
+			normal.vx = tmpoly.uvect_normal.vx;
+			normal.vy = tmpoly.uvect_normal.vy;
+			normal.vz = tmpoly.uvect_normal.vz;
+
+			
+			//camera to face vector (no need to find center of the polygon, so first point is OK)
+			vect2poly.vx = scene_3to2v2->objects[i].points_3d[tmpoly.point_id[0]].x - (int)camera.x;
+			vect2poly.vy = scene_3to2v2->objects[i].points_3d[tmpoly.point_id[0]].y - (int)camera.y;
+			vect2poly.vz = scene_3to2v2->objects[i].points_3d[tmpoly.point_id[0]].z - (int)camera.z;
+			
+			//get dot product
+			dotprod = vector_dotprod(vect2poly, normal);
+			
+			//face visible or not?
+			tmpoly.draw_it = (dotprod > 0.0f) ? 0 : 1;
+
+			//save poly data
+			scene_3to2v2->objects[i].polys[j] = tmpoly;
+
+		}	//bf culling cycle end (for one object)
+
 	}
 
 }
@@ -423,11 +542,13 @@ void do_3d_to_2d(t_scene *scene_3to2v2) {
 
 
 
-void draw2d_v2(t_scene *scene_d2v2)
+int draw2d_v2(t_scene *scene_d2v2)
 {
 	SDL_Point points_tmp[3 + 1] = { 0 };
+	SDL_Point points_norm[2] = { 0 };
 	int i, j, k;
 	int out_of_screen_points;
+	int polys_drawn = 0;
 
 
 	//printf("draw2d_v2 scene_d2v2.objects[0].num_polys:%d\n", scene_d2v2.objects[0].num_polys);
@@ -453,18 +574,29 @@ void draw2d_v2(t_scene *scene_d2v2)
 
 			}
 
+			if (0 && dbg_global == SDL_TRUE) {
+				//printf("object %d | poly %d | vect2poly (%.2f,%.2f,%.2f), normal (%.2f,%.2f,%.2f), dotprod %.2f\n", i, j, vect2poly.vx, vect2poly.vy, vect2poly.vz, normal.vx, normal.vy, normal.vz, dotprod);
+				printf("object %d | poly %2d | drawit %s\n", k, i, scene_d2v2->objects[k].polys[i].draw_it ? "true " : "false");
+			}
+
 			//dont draw triangle if all points are outside of the window
-			if (out_of_screen_points < 3) {
+			if ((out_of_screen_points < 3) && (scene_d2v2->objects[k].polys[i].draw_it == 1)) {
 				points_tmp[3].x = points_tmp[0].x;
 				points_tmp[3].y = points_tmp[0].y;
 				SDL_RenderDrawLines(renderer, points_tmp, 3 + 1);
+				polys_drawn++;
 				//printf("draw2d_v2 p3x:%d, p3y:%d; ", points_tmp[3].x, points_tmp[3].y);
 			}
 			//printf("\n");
 		}
+
+		if (0 && dbg_global == SDL_TRUE) {
+			//printf("object %d | poly %d | vect2poly (%.2f,%.2f,%.2f), normal (%.2f,%.2f,%.2f), dotprod %.2f\n", i, j, vect2poly.vx, vect2poly.vy, vect2poly.vz, normal.vx, normal.vy, normal.vz, dotprod);
+			printf("\n");
+		}
 	}
 
-
+	return polys_drawn;
 
 }
 int create_lot_cubes_v2(void)
@@ -478,27 +610,32 @@ int create_lot_cubes_v2(void)
 	//v2
 	t_point3d *p_cube_points_3d;
 	t_point2d *p_cube_points_2d;
+	t_poly *p_cube_polys;
 	//t_poly *cube_polyconns;
 	int num_objects = 1;
 	int rand_x, rand_y, rand_z;
 	#define MAXDISTANCE_V2 (BLOCKSIZE_V2 * DISTANCE_V2 * 2 + CUBES_V2)
+	//#define MAXDISTANCE_V2 (BLOCKSIZE_V2 + DISTANCE_V2 *  CUBES_V2)
 
 	//randomnumber = rand() % MAXDISTANCE;
 	for (k = 1; k < CUBES_V2; k++) {
-		objs_v2[k].num_points = 8;
-		objs_v2[k].num_polys = 12;
-		objs_v2[k].polys = cube_polyconns;	//global stuff
+		objs_v2[k].num_points = objs_v2[0].num_points;
+		objs_v2[k].num_polys = objs_v2[0].num_polys;
+		objs_v2[k].polys = cube_polys;	//global stuff
 		objs_v2[k].points_2d = cube_points_2d;
 		p_cube_points_3d = (t_point3d *)malloc(8 * sizeof(t_point3d));
 		p_cube_points_2d = (t_point2d *)malloc(8 * sizeof(t_point2d));
-		if (p_cube_points_3d == NULL || p_cube_points_2d == NULL)
+		p_cube_polys = (t_poly *)malloc(12 * sizeof(t_poly));
+		if (p_cube_points_3d == NULL || p_cube_points_2d == NULL || p_cube_polys == NULL)
 			return -1;
 		objs_v2[k].points_2d = p_cube_points_2d;
 		objs_v2[k].points_3d = p_cube_points_3d;
+		objs_v2[k].polys = p_cube_polys;
+		memcpy(objs_v2[k].polys, objs_v2[0].polys, 12 * sizeof(t_poly) );
 		rand_x = rand() % MAXDISTANCE_V2;
 		rand_y = rand() % MAXDISTANCE_V2;
 		rand_z = rand() % MAXDISTANCE_V2;
-		for (i = 0; i < 8; i++) {
+		for (i = 0; i < objs_v2[0].num_points; i++) {
 			objs_v2[k].points_3d[i].x = objs_v2[0].points_3d[i].x + rand_x;
 			objs_v2[k].points_3d[i].y = objs_v2[0].points_3d[i].y + rand_y;
 			objs_v2[k].points_3d[i].z = objs_v2[0].points_3d[i].z + rand_z;
@@ -553,7 +690,7 @@ int create_lot_cubes_v2(void)
 
 
 
-
+/*
 //old stuff here - will be deleted later
 void render_scene(void)
 {
@@ -752,3 +889,72 @@ void create_lot_cubes(void)
 
 	//t_poly3d cube3d[2 * 6 * CUBES] = {
 }
+
+*/
+
+t_vector vector_crossprod(t_vector inputv1, t_vector inputv2)
+//https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_olcEngine3D_Part3.cpp
+{
+	t_vector retvect;	//returned vector
+	//retvect.vx = inputv1.vy * inputv2.vz - inputv1.vz * inputv2.vy;
+	//retvect.vy = inputv1.vx * inputv2.vz - inputv1.vz * inputv2.vx;
+	//retvect.vz = inputv1.vx * inputv2.vx - inputv1.vy * inputv2.vx;
+
+	retvect.vx = inputv1.vy * inputv2.vz - inputv1.vz * inputv2.vy;
+	retvect.vy = inputv1.vz * inputv2.vx - inputv1.vx * inputv2.vz;
+	retvect.vz = inputv1.vx * inputv2.vy - inputv1.vy * inputv2.vx;
+
+	if (retvect.vx == 0 && retvect.vy == 0 && retvect.vz == 0) {
+		printf("vector_crossprod error!\n");
+		printf("inputv1.vy * inputv2.vz - inputv1.vz * inputv2.vy = %f * %f - %f * %f = %f - %f = %f\n", inputv1.vy, inputv2.vz, inputv1.vz, inputv2.vy, inputv1.vy * inputv2.vz, inputv1.vz * inputv2.vy, retvect.vx);
+		printf("inputv1.vx * inputv2.vz - inputv1.vz * inputv2.vx = %f * %f - %f * %f = %f - %f = %f\n", inputv1.vx, inputv2.vz, inputv1.vz, inputv2.vx, inputv1.vx * inputv2.vz, inputv1.vz * inputv2.vx, retvect.vy);
+		printf("inputv1.vx * inputv2.vx - inputv1.vy * inputv2.vx = %f * %f - %f * %f = %f - %f = %f\n", inputv1.vx, inputv2.vx, inputv1.vy, inputv2.vx, inputv1.vx * inputv2.vx, inputv1.vy * inputv2.vx, retvect.vz);
+	}
+
+	return retvect;
+}
+
+double vector_dotprod(t_vector inputv1, t_vector inputv2)
+//https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_olcEngine3D_Part3.cpp
+{
+	return inputv1.vx * inputv2.vx + inputv1.vy * inputv2.vy + inputv1.vz * inputv2.vz;
+}
+
+
+t_vector vector_unitize(t_vector inputv)
+//http://www.fundza.com/vectors/normalize/
+{
+	t_vector retvect;	//returned vector
+	double length;
+
+	//calculate length
+	length = sqrt((inputv.vx * inputv.vx) + (inputv.vy * inputv.vy) + (inputv.vz * inputv.vz));
+
+	//unitize
+	retvect.vx = inputv.vx / length;
+	retvect.vy = inputv.vy / length;
+	retvect.vz = inputv.vz / length;
+
+	return retvect;
+
+}
+
+
+// ----------------------------------------------------------
+// ***************************************************************** testing shit starts
+void testing(void)
+{
+	t_vector ivect;
+	t_vector ovect;
+
+	ivect.vx = 3;
+	ivect.vy = 1;
+	ivect.vz = 2;
+
+	ovect = vector_unitize(ivect);
+	printf("ivect.vx=%f, ivect.vy=%f, ivect.vz=%f\n", ivect.vx, ivect.vy, ivect.vz);
+	printf("ovect.vx=%f, ovect.vy=%f, ovect.vz=%f\n", ovect.vx, ovect.vy, ovect.vz);
+	// ***************************************************************** testing shit ends
+
+}
+

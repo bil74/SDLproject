@@ -4,7 +4,7 @@
 
 
 //unit vector
-typedef struct t_vector {
+typedef struct {
 	double vx;
 	double vy;
 	double vz;
@@ -41,7 +41,7 @@ typedef struct {
 	int point_id[3];
 	int color;
 	int draw_it;
-	//normális, stb
+	t_vector uvect_normal;	//face normal unit vector
 }t_poly;
 
 //object v2
@@ -54,7 +54,7 @@ typedef struct {
 }t_obj;
 
 //scene v2
-typedef struct t_scene {
+typedef struct {
 	//some global shit
 	//light sources
 	//3d segment
