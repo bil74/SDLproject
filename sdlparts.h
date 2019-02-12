@@ -12,7 +12,6 @@
 
 //public variables
 
-
 //static variables
 
 // public functions
@@ -20,7 +19,7 @@ extern int sdl_open(void);
 extern void sdl_close(void);
 extern void setup_screen(void);
 extern void display_screen(void);
-void display_text(int screen_x, int screen_y, char *text2disp);
+void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color color);
 
 /*
 extern void InitTimer(void);	//call once on start app

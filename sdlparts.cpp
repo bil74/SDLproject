@@ -29,8 +29,8 @@ int sdl_open(void) {
 		return -1;
 	}
 
-	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_res_x, screen_res_y, SDL_WINDOW_FULLSCREEN_DESKTOP);
-	//window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_res_x, screen_res_y, 0);
+	//window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_res_x, screen_res_y, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_res_x, screen_res_y, 0);
 	// Check that the window was successfully created
 	if (window == NULL) {
 		printf("Could not create window: %s\n", SDL_GetError());
@@ -97,12 +97,12 @@ int ttf_init_setup(char *font_file) {
 
 }
 
-void display_text(int screen_column, int screen_row, char *text2disp)
+void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color color)
 {
 	const int font_width = 10;
 	const int font_height = 15;
 
-	SDL_Surface *surfaceMessage = TTF_RenderText_Shaded(ttf_Font, text2disp, ttf_FColor, ttf_BColor); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+	SDL_Surface *surfaceMessage = TTF_RenderText_Shaded(ttf_Font, text2disp, color, ttf_BColor); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
 
 	//printf("surfaceMessage:%p\n", surfaceMessage);
 
