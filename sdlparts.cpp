@@ -104,7 +104,7 @@ void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color 
 
 	SDL_Surface *surfaceMessage = TTF_RenderText_Shaded(ttf_Font, text2disp, color, ttf_BColor); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
 
-	//printf("surfaceMessage:%p\n", surfaceMessage);
+																								 //printf("surfaceMessage:%p\n", surfaceMessage);
 
 	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage); //now you can convert it into a texture
 
@@ -114,14 +114,14 @@ void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color 
 	Message_rect.w = strlen(text2disp) * font_width; // controls the width of the rect
 	Message_rect.h = font_height; // controls the height of the rect
 
-	//Mind you that (0,0) is on the top left of the window/screen, 
-	// think a rect as the text's box, that way it would be very simple to understance
+								  //Mind you that (0,0) is on the top left of the window/screen, 
+								  // think a rect as the text's box, that way it would be very simple to understance
 
-	//Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
+								  //Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
 
-	//you put the renderer's name first, 
-	// the Message, 
-	// the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
+								  //you put the renderer's name first, 
+								  // the Message, 
+								  // the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
 
 	SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
 	//SDL_RenderCopy(renderer, Message, &Message_rect, NULL);

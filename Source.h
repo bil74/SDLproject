@@ -8,7 +8,7 @@ typedef struct {
 	double vx;
 	double vy;
 	double vz;
-} t_vector;
+}t_vector;
 
 typedef struct {
 	double x;		//position
@@ -17,29 +17,35 @@ typedef struct {
 	double roty;	//rotation in degree (0-360)
 	double rotx;
 	double rotz;
+	double cx;
+	double sx;
+	double cy;
+	double sy;
+	double cz;
+	double sz;
+
 	double curr_segment_3d;		//felosztjuk a teret kockákra és csak az akuális plusz szomszédos szegmenseket rajzoljuk meg
 	t_vector uvect;	//unit vector
 	t_vector uvect_default;	//unit vector default
-} t_camera;
+}t_camera;
 
 typedef struct {
 	signed int x;
 	signed int y;
 	signed int z;
-	signed int tz;	//transformed z
 }t_point3d;
 
 typedef struct {
-	int x;
-	int y;
+	signed int x;
+	signed int y;
 }t_point2d;
 
 typedef struct {
 	signed int x;
 	signed int y;
+	signed int z;	//save depth
 	bool valid;
-}t_point2d_plus;
-
+}t_point2d_tf;
 
 
 //v2 - this is used now
@@ -48,7 +54,6 @@ typedef struct {
 	SDL_Color color;
 	int draw_it;
 	t_vector uvect_normal;	//face normal unit vector
-	float lightmag;			//light magnitude (0-1)
 }t_poly;
 
 //object v2
@@ -56,7 +61,7 @@ typedef struct {
 	int num_points;
 	int num_polys;
 	t_point3d *points_3d;
-	t_point2d_plus *points_2d;
+	t_point2d_tf *points_2d_tf;
 	t_poly *polys;
 }t_obj;
 
@@ -69,37 +74,9 @@ typedef struct {
 	t_point3d lightpos;
 	int num_objects;
 	t_obj *objects;
-}t_scene;
+} t_scene;
 
-//------------------------------------------------------------------------------------------------
 
-//v3 stuff - poly oriented
-//scene v2 is OK
-
-typedef struct {	//must be working without knowing the object
-	t_point3d points3d[3];	//original - no modify
-	t_point2d points2d[3];	//calculated
-	SDL_Color color;		//original - no modify
-	int draw_it;
-	t_vector uvect_normal;	//face normal unit vector - calculated once
-	float lightmag;			//light magnitude (0-1)
-	int camz;				//z of first point for sorting
-}t_poly3;
-
-typedef struct {
-	int num_polys;
-	t_poly3 *polys;
-}t_obj3;
-
-typedef struct {
-	//some global shit
-	//light sources
-	//3d segment
-	//drawing type (wireframe, solid, textured)
-	t_point3d lightpos;
-	int num_objects;
-	t_obj3 *objects;
-}t_scene3;
 
 typedef struct {
 	t_point2d points[4];
@@ -114,23 +91,9 @@ typedef struct {
 
 
 
-//------------------------------------------------------------------------------------------------
-//v1 - not used - will be deleted
 
 
-typedef struct {
-	t_point3d points[3];
-	int color;
-	int draw_it;
-	//normális, stb
-}t_poly3d;
 
-typedef struct {
-	t_point2d points[3];
-	int color;
-	int draw_it;
-	//normális, stb
-}t_poly2d;
 
 
 
