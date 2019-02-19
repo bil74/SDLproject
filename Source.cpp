@@ -21,8 +21,10 @@ using namespace std;
 
 extern int screen_res_x;
 extern int screen_res_y;
+extern Uint32 *pixels;		//texture mem
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
+extern SDL_Texture *texture;
 
 //timers
 INT64 timer_main = 0;
@@ -33,9 +35,9 @@ INT64 timer_frame = 0;
 t_point3d cube_points_3d[8] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },  /**/  
 								{ -100, -100,  100 }, { -100, 100,  100 }, { 100, 100,  100 }, { 100, -100,  100 } };
 t_point2d_tf cube_points_2d[8] = {0};
-t_poly cube_polys[2 * 6] = { { 0,1,2 ,{255,255,255,255},0, {0,0,0}}, { 2,3,0 ,{ 255,255,255,255 },0,{ 0,0,0 } },  { 6,5,4 ,{ 255,255,255,255 },0,{ 0,0,0 } }, { 4,7,6 ,{ 255,255,255,255 },0,{ 0,0,0 } },
-							{ 2,6,7 ,{ 255,255,255,255 },0, { 0,0,0 } }, { 3,2,7 ,{ 255,255,255,255 },0,{ 0,0,0 } },  { 4,5,1 ,{ 255,255,255,255 },0,{ 0,0,0 } }, { 1,0,4 ,{ 255,255,255,255 },0,{ 0,0,0 } },
-							{ 5,6,2 ,{ 255,255,255,255 },0,{ 0,0,0 } }, { 2,1,5 ,{ 255,255,255,255 },0,{ 0,0,0 } },  { 3,7,4 ,{ 255,255,255,255 },0,{ 0,0,0 } }, { 4,0,3 ,{ 255,255,255,255 },0,{ 0,0,0 } } };
+t_poly cube_polys[2 * 6] = { { 0,1,2 ,{255,255,255,0},0, {0,0,0}}, { 2,3,0 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 6,5,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,7,6 ,{ 255,255,255,0 },0,{ 0,0,0 } },
+							{ 2,6,7 ,{ 255,255,255,0 },0, { 0,0,0 } }, { 3,2,7 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 4,5,1 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 1,0,4 ,{ 255,255,255,0 },0,{ 0,0,0 } },
+							{ 5,6,2 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 2,1,5 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 3,7,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,0,3 ,{ 255,255,255,0 },0,{ 0,0,0 } } };
 
 t_obj objs_v2[CUBES_V2] = {
 {8, 2 * 6, cube_points_3d, cube_points_2d, cube_polys}
@@ -81,13 +83,13 @@ void transform_object(t_obj *object, t_point3d *lightpos);
 int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_draw *draw_data);
 void sort_polys(void);
 void draw_polys(void);
-void drawpoly_wf_v3(t_draw *draw);
 void drawpoly_fill_v3(t_draw *draw);
 int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point *memloc);
 int backface_culling(t_poly *p_poly, t_point3d *p_points3d);
 void transform_points(t_obj *object);
 int get_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_draw *p_draw_data);
 void set_color(t_poly *p_poly, t_point3d *p_points3d, t_point3d *p_lightpos, t_draw *p_draw_data);
+void TextureFill(Uint32 *pixelmem, SDL_Color color, SDL_Point *points);
 
 //global stuff for displaying result
 t_draw *p_glb_polys2sort;
@@ -450,22 +452,10 @@ void display_scene(t_scene *scene)
 	sort_polys();
 	draw_polys();
 
+	//update texture
+	SDL_UpdateTexture(texture, NULL, pixels, screen_res_x * sizeof(Uint32));
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
 
-	/*
-	for (i = 0; i < scene_rsv2->num_objects; i++) {
-		for (j = 0; j < scene_rsv2->objects[i].num_polys; j++) {
-			if (0 && dbg_global == SDL_TRUE) {
-				//printf("object %d | poly %d | vect2poly (%.2f,%.2f,%.2f), normal (%.2f,%.2f,%.2f), dotprod %.2f\n", i, j, vect2poly.vx, vect2poly.vy, vect2poly.vz, normal.vx, normal.vy, normal.vz, dotprod);
-				printf("object %d | poly %2d | drawit %s\n", i, j, scene_rsv2->objects[i].polys[j].draw_it ? "true " : "false");
-			}
-		}
-		if (0 && dbg_global == SDL_TRUE)
-			printf("\n");
-	}
-	*/
-
-	//printf("render scene v2 math done!\n");
-	//return;
 
 	num_of_frames++;
 	//refresh frametime value
@@ -490,9 +480,9 @@ void display_scene(t_scene *scene)
 		sprintf_s(text2print4, sizeof(text2print4), "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
 #else
 		sprintf(text2print1, "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
-		sprintf(text2print2, "fps: %.2f, cubes: %d, polys drawn: %d", (float)(1000.00 / frametime), CUBES_V3, polycount);				//float
+		sprintf(text2print2, "fps: %.2f, cubes: %d, polys drawn: %d", (float)(1000.00 / frametime), CUBES_V2, glb_polycount);				//float
 		sprintf(text2print3, "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
-		sprintf(text2print4, "lightpos = %.2f, %.2f, %.2f", scene_rsv3->lightpos.x, scene_rsv3->lightpos.y, scene_rsv3->lightpos.x);
+		sprintf(text2print4, "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
 #endif
 		//display_text(0, ypos++, text2print1, col_texts);	//camera data
 		display_text(0, ypos++, text2print2, col_texts);	//fps & co
@@ -571,9 +561,10 @@ int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_draw *d
 //return value
 //0: must be drawn
 {
-
+	
 	if (backface_culling(p_poly, object->points_3d) != 0)
 		return -1;		//not visible
+	
 
 	if (get_screen_coords(p_poly, object->points_2d_tf, draw_data) != 0)
 		return -1;		//out of screen
@@ -617,9 +608,9 @@ int get_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_draw *p_dra
 			p_draw_data->points[i].x = p_points2d_tf[p].x + (screen_res_x / 2);
 			p_draw_data->points[i].y = -(p_points2d_tf[p].y) + (screen_res_y / 2);
 			//check visibility based on screen coordinates
-			if (p_draw_data->points[i].x < 0 || p_draw_data->points[i].x > screen_res_x)
+			if (p_draw_data->points[i].x < 0 || p_draw_data->points[i].x > screen_res_x-1)
 				out_of_screen_points++;
-			else if (p_draw_data->points[i].y < 0 || p_draw_data->points[i].y > screen_res_y)
+			else if (p_draw_data->points[i].y < 0 || p_draw_data->points[i].y > screen_res_y-1)
 				out_of_screen_points++;
 			//save depth for screen point
 			if (i == 0)
@@ -628,7 +619,7 @@ int get_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_draw *p_dra
 				p_draw_data->zdist = (p_draw_data->zdist + (int)z) / 2;
 		}
 		else 
-			out_of_screen_points++;
+			out_of_screen_points+=3;
 	}
 
 	if (out_of_screen_points >= 3)
@@ -649,6 +640,14 @@ void set_color(t_poly *p_poly, t_point3d *p_points3d, t_point3d *p_lightpos, t_d
 	t_vector vect2poly;
 	double dotprod;
 	float lightmag;
+
+	//test
+	/*
+	p_draw_data->color.r = p_poly->color.r;
+	p_draw_data->color.g = p_poly->color.g;
+	p_draw_data->color.b = p_poly->color.b;
+	return;
+	*/
 
 	//camera to face vector (no need to find center of the polygon, so first point is OK)
 	vect2poly.vx = p_points3d[p_poly->point_id[0]].x - p_lightpos->x;
@@ -698,27 +697,11 @@ void draw_polys(void)
 	for (i = 0; i < glb_polycount; i++) {
 		p_draw = (p_glb_polys2sort + i);
 		drawpoly_fill_v3(p_glb_polys2sort + i);
-		//drawpoly_wf_v3(p_glb_polys2sort + i);
-		if (dbg_global == SDL_TRUE) {
-			printf("draw_polys | p_draw (%d,%d), (%d,%d), (%d,%d)\n", p_draw->points[0].x, p_draw->points[0].y, p_draw->points[1].x, p_draw->points[1].y, p_draw->points[2].x, p_draw->points[2].y);
+		if (0 && dbg_global == SDL_TRUE) {
+			printf("draw_polys | p_draw %d (%d,%d), (%d,%d), (%d,%d)\n",i,  p_draw->points[0].x, p_draw->points[0].y, p_draw->points[1].x, p_draw->points[1].y, p_draw->points[2].x, p_draw->points[2].y);
 		}
 	}
 }
-
-void drawpoly_wf_v3(t_draw *draw)
-//wireframe draw
-{
-	//set color
-	SDL_SetRenderDrawColor(renderer, draw->color.r, draw->color.g, draw->color.b, draw->color.a);
-
-	if (0 && dbg_global == SDL_TRUE) {
-		printf("point 1:(%d,%d), point 2:(%d,%d), point 3:(%d,%d), point 4:(%d,%d)\n", draw->points[0].x, draw->points[0].y, draw->points[1].x, draw->points[1].y, draw->points[2].x, draw->points[2].y, draw->points[3].x, draw->points[3].y);
-	}
-
-	//draw
-	SDL_RenderDrawLines(renderer, (SDL_Point*)draw->points, 3 + 1);
-}
-
 
 
 
@@ -798,7 +781,7 @@ void drawpoly_fill_v3(t_draw *draw)
 			tmpoints[1] = line2[i];
 			if (0 && dbg_global == SDL_TRUE)
 				printf("line drawing | point a:(%d,%d), point b:(%d,%d)\n", tmpoints[0].x, tmpoints[0].y, tmpoints[1].x, tmpoints[1].y);
-			SDL_RenderDrawLines(renderer, tmpoints, 2);
+				TextureFill(pixels, draw->color, tmpoints);
 		}
 		if (0 && dbg_global == SDL_TRUE)
 			printf("\n");
@@ -812,6 +795,46 @@ void drawpoly_fill_v3(t_draw *draw)
 	return;
 }
 
+void TextureFill(Uint32 *pixelmem, SDL_Color color, SDL_Point *points)
+{
+	int i;
+	int tmpx1;
+	int tmpx2;
+	int cnt;			//points to draw
+	Uint32 *u32mem = pixelmem;
+
+	//exit if y is out of screen
+	if (points[0].y < 0 || points[0].y >= screen_res_y-1)
+		return;
+
+	//fill starting and ending x coordinate
+	if (points[0].x <= points[1].x) {
+		tmpx1 = points[0].x;
+		tmpx2 = points[1].x;
+	}
+	else {
+		tmpx1 = points[1].x;
+		tmpx2 = points[0].x;
+	}
+
+	//exit if x is out of screen
+	if (tmpx1 > screen_res_x || tmpx2 < 0)
+		return;
+
+	//clipping x
+	tmpx1 = (tmpx1 >= 0) ? tmpx1 : 0;
+	tmpx2 = (tmpx2 < screen_res_x) ? tmpx2 : (screen_res_x-1);
+
+	//set length
+	cnt =  abs(tmpx2 - tmpx1);
+
+	//fill memory
+	u32mem = pixelmem + points[0].y*screen_res_x + tmpx1;
+	for (i = 0; i < cnt; i++) {
+		memcpy(u32mem++, &color, sizeof(Uint32));
+	}
+	
+}
 
 int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point *memloc)
 {
@@ -986,10 +1009,6 @@ t_vector vector_crossprod(t_vector inputv1, t_vector inputv2)
 //https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_olcEngine3D_Part3.cpp
 {
 	t_vector retvect;	//returned vector
-	//retvect.vx = inputv1.vy * inputv2.vz - inputv1.vz * inputv2.vy;
-	//retvect.vy = inputv1.vx * inputv2.vz - inputv1.vz * inputv2.vx;
-	//retvect.vz = inputv1.vx * inputv2.vx - inputv1.vy * inputv2.vx;
-
 	retvect.vx = inputv1.vy * inputv2.vz - inputv1.vz * inputv2.vy;
 	retvect.vy = inputv1.vz * inputv2.vx - inputv1.vx * inputv2.vz;
 	retvect.vz = inputv1.vx * inputv2.vy - inputv1.vy * inputv2.vx;

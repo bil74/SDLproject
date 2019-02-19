@@ -7,8 +7,8 @@
 #include "sdlparts.h"
 
 #define WINDOW_TITLE "sdl3d try"
-extern SDL_Window* window = NULL;
-extern SDL_Renderer* renderer = NULL;
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
 int screen_res_x = 640;
 int screen_res_y = 480;
 //const char *font_file = { "C:\\Windows\\Fonts\\lucon.ttf" };
@@ -17,6 +17,8 @@ const char *font_file = { "Vera.ttf" };
 TTF_Font *ttf_Font; //this opens a font style and sets a size
 SDL_Color ttf_FColor;  // foreground color
 SDL_Color ttf_BColor;  // background color
+Uint32 *pixels;
+SDL_Texture *texture;
 
 
 //local functions
@@ -49,6 +51,20 @@ int sdl_open(void) {
 		return -1;
 	}
 
+	//now we will draw to texture
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, screen_res_x, screen_res_y);
+	if (texture == NULL) {
+		printf("creating texture failed!\n");
+		return -1;
+	}
+	
+	//allocate mem for it
+	pixels = (Uint32*) malloc(sizeof(Uint32)* screen_res_x * screen_res_y);	//Uint32[640 * 480];
+	if (pixels == NULL) {
+		printf("malloc pixels failed!\n");
+		return -1;
+	}
+
 	//init SDL TrueType fonts to write to screen
 	if (TTF_Init() == -1)
 	{
@@ -64,6 +80,13 @@ int sdl_open(void) {
 
 
 void sdl_close(void) {
+
+	//close texture stuff
+	if (pixels)
+		free(pixels);
+	if (texture)
+		SDL_DestroyTexture(texture);
+
 	if (renderer) {
 		SDL_DestroyRenderer(renderer);
 	}
@@ -76,9 +99,7 @@ void sdl_close(void) {
 }
 
 void setup_screen(void) {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(renderer);
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+	memset(pixels, 0, screen_res_x * screen_res_y * sizeof(Uint32));
 }
 
 void display_screen(void) {
@@ -130,3 +151,4 @@ void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color 
 	SDL_DestroyTexture(Message);
 	SDL_FreeSurface(surfaceMessage);
 }
+
