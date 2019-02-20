@@ -79,7 +79,7 @@ typedef struct {
 
 
 typedef struct {
-	t_point2d points[4];
+	t_point2d points[3];
 	SDL_Color color;
 	int zdist;
 }t_draw;

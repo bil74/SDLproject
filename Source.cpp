@@ -16,8 +16,7 @@ using namespace std;
 
 
 #define PI 3.14159265
-#define CUBES 1
-#define CUBES_V2 500
+#define OBJS_V2 100
 
 extern int screen_res_x;
 extern int screen_res_y;
@@ -31,24 +30,209 @@ INT64 timer_main = 0;
 INT64 timer_refr_txt = 0;
 INT64 timer_frame = 0;
 
-//cube object v2
-t_point3d cube_points_3d[8] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },  /**/  
+
+
+// ----------------------------------------------------- videoship object v2
+t_point3d obj_points_3d[55] = {
+	{ 100  ,    -100  ,    -100 },
+	{ 100  ,    100   ,    -100 },
+	{ 100  ,    -100  ,    100 },
+	{ 100  ,    100   ,    100 },
+	{ -100 ,    -100  ,    -100 },
+	{ -100 ,    100   ,    -100 },
+	{ -100 ,    -100  ,    100 },
+	{ -100 ,    100   ,    100 },
+	{ -72  ,    12    ,    -140 },
+	{ 30   ,    0     ,    500 },
+	{ -60  ,    -60   ,    -140 },
+	{ -30  ,    0     ,    500 },
+	{ -120 ,    20    ,    100 },
+	{ -60  ,    60    ,    -140 },
+	{ -120 ,    -20   ,    -100 },
+	{ -120 ,    20    ,    -100 },
+	{ 120  ,    -20   ,    100 },
+	{ 120  ,    -20   ,    -100 },
+	{ 120  ,    20    ,    -100 },
+	{ 120  ,    20    ,    100 },
+	{ -120 ,    -20   ,    100 },
+	{ 60   ,    60    ,    -140 },
+	{ 60   ,    -60   ,    -140 },
+	{ -420 ,    6     ,    100 },
+	{ -420 ,    -6    ,    100 },
+	{ -420 ,    -6    ,    -100 },
+	{ -420 ,    6     ,    -100 },
+	{ 420  ,    -6    ,    100 },
+	{ 420  ,    -6    ,    -100 },
+	{ 420  ,    6     ,    -100 },
+	{ 420  ,    6     ,    100 },
+	{ 420  ,    -18   ,    100 },
+	{ 420  ,    -18   ,    -100 },
+	{ 420  ,    18    ,    -100 },
+	{ 420  ,    18    ,    100 },
+	{ 450  ,    -18   ,    100 },
+	{ 450  ,    -18   ,    -100 },
+	{ 450  ,    18    ,    -100 },
+	{ 450  ,    18    ,    100 },
+	{ -420 ,    18    ,    100 },
+	{ -420 ,    -18   ,    100 },
+	{ -420 ,    -18   ,    -100 },
+	{ -420 ,    18    ,    -100 },
+	{ -450 ,    18    ,    100 },
+	{ -450 ,    -18   ,    100 },
+	{ -450 ,    -18   ,    -100 },
+	{ -450 ,    18    ,    -100 },
+	{ 435  ,    -18   ,    300 },
+	{ 435  ,    18    ,    300 },
+	{ -435 ,    18    ,    300 },
+	{ -435 ,    -18   ,    300 },
+	{ 0    ,    -70   ,    300 },
+	{ -72  ,    -12   ,    -140 },
+	{ 72   ,    -12   ,    -140 },
+	{ 72   ,    12    ,    -140 }
+
+};
+
+t_point2d_tf obj_points_2d[55] = { 0 };
+
+t_poly obj_polys[98] = {
+	{ 20, 51, 11  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 5 , 12, 7   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 4 , 22, 0   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 6 , 0 , 2   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 3 , 5 , 7   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 3 , 11, 9   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 16, 19, 9   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 19, 3 , 9   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 16, 51, 2   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 6 , 2 , 51  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 15, 13, 8   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 6 , 14, 4   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 19, 29, 18  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 17, 22, 53  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 3 , 18, 1   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 0 , 16, 2   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 12, 24, 20  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 12, 20, 11  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 11, 51, 9   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 7 , 12, 11  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 14, 26, 15  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 20, 25, 14  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 15, 23, 12  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 30, 33, 29  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 17, 27, 16  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 16, 30, 19  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 18, 28, 17  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 31, 48, 34  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 28, 31, 27  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 37, 35, 36  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 33, 36, 32  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 34, 37, 33  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 32, 35, 31  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 42, 43, 39  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 24, 41, 25  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 26, 39, 23  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 43, 45, 44  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 39, 43, 49  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 41, 46, 42  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 40, 45, 41  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 43, 46, 45  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 31, 35, 47  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 38, 34, 48  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 38, 47, 35  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 44, 50, 49  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 39, 50, 40  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 44, 40, 50  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 44, 49, 43  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 17, 28, 27  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 16, 27, 30  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 3 , 1 , 5   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 17, 54, 18  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 14, 10, 4   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 18, 21, 1   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 1 , 13, 5   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 15, 52, 14  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 52, 8 , 53  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 18, 29, 28  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 14, 25, 26  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 15, 26, 23  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 12, 23, 24  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 20, 24, 25  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 6 , 20, 14  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 6 , 4 , 0   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 20, 6 , 51  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 0 , 17, 16  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 16, 9 , 51  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 3 , 19, 18  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 19, 30, 29  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 3 , 7 , 11  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 42, 46, 43  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 5 , 15, 12  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 39, 49, 50  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 40, 44, 45  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 41, 45, 46  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 1 , 21, 13  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 18, 54, 21  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 17, 53, 54  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 17, 0 , 22  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 4 , 10, 22  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 14, 52, 10  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 15, 8 , 52  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 15, 5 , 13  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 8 , 13, 21  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 21, 54, 8   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 54, 53, 8   ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 53, 22, 10  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 10, 52, 53  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 33, 37, 36  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 37, 38, 35  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 38, 48, 47  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 34, 38, 37  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 32, 36, 35  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 24, 40, 41  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 26, 42, 39  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 30, 34, 33  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 28, 32, 31  ,{ 255,255,255,0 },0,{ 0,0,0 } },
+	{ 31, 47, 48  ,{ 255,255,255,0 },0,{ 0,0,0 } }
+};
+
+t_obj objs[OBJS_V2] = {
+	{ 55, 98, obj_points_3d, obj_points_2d, obj_polys }
+};
+
+t_scene scene = {
+	{ -1000,-1000,-1000 },
+	OBJS_V2,
+	objs
+};
+
+
+
+
+
+
+
+
+
+
+/*
+// ----------------------------------------------------- cube object v2
+t_point3d obj_points_3d[8] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },  
 								{ -100, -100,  100 }, { -100, 100,  100 }, { 100, 100,  100 }, { 100, -100,  100 } };
-t_point2d_tf cube_points_2d[8] = {0};
-t_poly cube_polys[2 * 6] = { { 0,1,2 ,{255,255,255,0},0, {0,0,0}}, { 2,3,0 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 6,5,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,7,6 ,{ 255,255,255,0 },0,{ 0,0,0 } },
+t_point2d_tf obj_points_2d[8] = {0};
+t_poly obj_polys[2 * 6] = { { 0,1,2 ,{255,255,255,0},0, {0,0,0}}, { 2,3,0 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 6,5,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,7,6 ,{ 255,255,255,0 },0,{ 0,0,0 } },
 							{ 2,6,7 ,{ 255,255,255,0 },0, { 0,0,0 } }, { 3,2,7 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 4,5,1 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 1,0,4 ,{ 255,255,255,0 },0,{ 0,0,0 } },
 							{ 5,6,2 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 2,1,5 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 3,7,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,0,3 ,{ 255,255,255,0 },0,{ 0,0,0 } } };
 
-t_obj objs_v2[CUBES_V2] = {
-{8, 2 * 6, cube_points_3d, cube_points_2d, cube_polys}
+t_obj objs[OBJS_V2] = {
+{8, 2 * 6, obj_points_3d, obj_points_2d, obj_polys}
 };
 
 t_scene scene = {
 	{0,0,0 },
-	CUBES_V2,
-	objs_v2
+	OBJS_V2,
+	objs
 };
-
+*/
 
 
 //not used
@@ -77,7 +261,7 @@ void movement(void);
 void move_camera(void);
 void getkeys(void);
 
-int create_lot_cubes_v2(void);
+int create_lot_objs_v2(void);
 void display_scene(t_scene *scene);
 void transform_object(t_obj *object, t_point3d *lightpos);
 int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_draw *draw_data);
@@ -90,6 +274,7 @@ void transform_points(t_obj *object);
 int get_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_draw *p_draw_data);
 void set_color(t_poly *p_poly, t_point3d *p_points3d, t_point3d *p_lightpos, t_draw *p_draw_data);
 void TextureFill(Uint32 *pixelmem, SDL_Color color, SDL_Point *points);
+int sign(int x);
 
 //global stuff for displaying result
 t_draw *p_glb_polys2sort;
@@ -288,7 +473,7 @@ int init_some_stuff(void)
 
 	//create_lot_cubes();
 	
-	if (create_lot_cubes_v2() == -1)
+	if (create_lot_objs_v2() == -1)
 		return -1;
 	
 	
@@ -312,7 +497,7 @@ int init_some_stuff(void)
 	}
 	
 	//calculate normal vectors of initial object
-	//don't forget to duplicate them in create_lot_cubes_v2!!!
+	//don't forget to duplicate them in create_lot_objs_v2!!!
 	{
 		int i, j;
 		double ax,ay,az, bx,by,bz, cx,cy,cz;
@@ -332,13 +517,15 @@ int init_some_stuff(void)
 				cy = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[2]].y;
 				cz = scene.objects[0].points_3d[scene.objects[j].polys[i].point_id[2]].z;
 
+				//point a to point b
 				vect1.vx = bx - ax;
 				vect1.vy = by - ay;
 				vect1.vz = bz - az;
-
+				//point b to point c
 				vect2.vx = cx - bx;
 				vect2.vy = cy - by;
 				vect2.vz = cz - bz;
+
 
 				crossvect = vector_crossprod(vect1, vect2);
 				normvect = vector_unitize(crossvect);
@@ -402,10 +589,10 @@ void close_some_stuff(void)
 	int k;
 
 	//free mallocs
-	for (k = 1; k < CUBES_V2; k++) {
-		free (objs_v2[k].points_2d_tf);
-		free (objs_v2[k].points_3d);
-		free(objs_v2[k].polys);
+	for (k = 1; k < OBJS_V2; k++) {
+		free (objs[k].points_2d_tf);
+		free (objs[k].points_3d);
+		free(objs[k].polys);
 	}
 
 	//free space for sorting polys
@@ -475,12 +662,12 @@ void display_scene(t_scene *scene)
 		char text2print4[100];
 #ifndef _LINUX_
 		sprintf_s(text2print1, sizeof(text2print1), "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
-		sprintf_s(text2print2, sizeof(text2print2), "fps: %.2f, cubes: %d, polys drawn: %d", (float)(1000.00 / frametime), CUBES_V2, glb_polycount);				//float
+		sprintf_s(text2print2, sizeof(text2print2), "fps: %.2f, objects: %d, polys drawn: %d", (float)(1000.00 / frametime), OBJS_V2, glb_polycount);				//float
 		sprintf_s(text2print3, sizeof(text2print3), "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
 		sprintf_s(text2print4, sizeof(text2print4), "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
 #else
 		sprintf(text2print1, "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
-		sprintf(text2print2, "fps: %.2f, cubes: %d, polys drawn: %d", (float)(1000.00 / frametime), CUBES_V2, glb_polycount);				//float
+		sprintf(text2print2, "fps: %.2f, objects: %d, polys drawn: %d", (float)(1000.00 / frametime), OBJS_V2, glb_polycount);				//float
 		sprintf(text2print3, "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
 		sprintf(text2print4, "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
 #endif
@@ -506,7 +693,7 @@ void transform_object(t_obj *object, t_point3d *lightpos)
 
 	for (p_poly = object->polys; p_poly < (object->polys + object->num_polys); p_poly++) {
 		if (prepare_poly(p_poly, object, lightpos, &draw_data) == 0) {
-			//save draw data
+			//save draw data if poly can be drawn
 			*(p_glb_polys2sort + glb_polycount) = draw_data;
 			glb_polycount++;
 		}
@@ -569,6 +756,7 @@ int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_draw *d
 	if (get_screen_coords(p_poly, object->points_2d_tf, draw_data) != 0)
 		return -1;		//out of screen
 
+	//fade colors based on screen direction
 	set_color(p_poly, object->points_3d, p_lightpos, draw_data);
 
 	return 0;
@@ -598,20 +786,32 @@ int get_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_draw *p_dra
 {
 	int i;
 	int out_of_screen_points = 0;
-	int p,z;
+	int p,z,x,y;
+	int xsign = 0;
+	int ysign = 0;
 
 
 	for (i = 0; i < 3; i++) {
 		p = p_poly->point_id[i];
 		if (p_points2d_tf[p].valid) {
 			z = p_points2d_tf[p].z;
-			p_draw_data->points[i].x = p_points2d_tf[p].x + (screen_res_x / 2);
-			p_draw_data->points[i].y = -(p_points2d_tf[p].y) + (screen_res_y / 2);
+			x = p_points2d_tf[p].x + (screen_res_x / 2);
+			y = -(p_points2d_tf[p].y) + (screen_res_y / 2);
+
 			//check visibility based on screen coordinates
-			if (p_draw_data->points[i].x < 0 || p_draw_data->points[i].x > screen_res_x-1)
+			if (x < 0 || x >= screen_res_x)
 				out_of_screen_points++;
-			else if (p_draw_data->points[i].y < 0 || p_draw_data->points[i].y > screen_res_y-1)
+			else if (y < 0 || y >= screen_res_y)
 				out_of_screen_points++;
+
+			//add sign
+			ysign += sign(y);
+			xsign += sign(x);
+
+			//save x,y
+			p_draw_data->points[i].x = x;
+			p_draw_data->points[i].y = y;
+
 			//save depth for screen point
 			if (i == 0)
 				p_draw_data->zdist = z;
@@ -619,18 +819,27 @@ int get_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_draw *p_dra
 				p_draw_data->zdist = (p_draw_data->zdist + (int)z) / 2;
 		}
 		else 
-			out_of_screen_points+=3;
+			out_of_screen_points+=10;
 	}
 
-	if (out_of_screen_points >= 3)
+	//poly is not valid (before this function)
+	if (out_of_screen_points > 3)
 		return 1;
 
-	p_draw_data->points[3].x = p_draw_data->points[0].x;
-	p_draw_data->points[3].y = p_draw_data->points[0].y;
+	//if all points are outside of screen, we have to check if it is visible or not
+	//all points are outside of the same side: not visible
+	//points are on different sides of the screen: visible
+	if (out_of_screen_points == 3) {
+		if (abs(xsign) == 3 || abs(ysign) == 3)
+		return 1;
+	}
 	return 0;
 }
 
-
+//get sign (1 for positive, -1 for negative)
+int sign(int x) {
+	return (x > 0) - (x < 0);
+}
 
 
 
@@ -804,7 +1013,7 @@ void TextureFill(Uint32 *pixelmem, SDL_Color color, SDL_Point *points)
 	Uint32 *u32mem = pixelmem;
 
 	//exit if y is out of screen
-	if (points[0].y < 0 || points[0].y >= screen_res_y-1)
+	if (points[0].y < 0 || points[0].y >= screen_res_y)
 		return;
 
 	//fill starting and ending x coordinate
@@ -818,7 +1027,7 @@ void TextureFill(Uint32 *pixelmem, SDL_Color color, SDL_Point *points)
 	}
 
 	//exit if x is out of screen
-	if (tmpx1 > screen_res_x || tmpx2 < 0)
+	if (tmpx1 >= screen_res_x || tmpx2 < 0)
 		return;
 
 	//clipping x
@@ -914,7 +1123,7 @@ int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point *memloc)
 
 
 
-int create_lot_cubes_v2(void)
+int create_lot_objs_v2(void)
 {
 #define BLOCKSIZE_V2 10		//10^3 cubes
 #define CUBESIDE_V2 200
@@ -923,39 +1132,41 @@ int create_lot_cubes_v2(void)
 	int i,k;
 
 	//v2
-	t_point3d *p_cube_points_3d;
-	t_point2d_tf *p_cube_points_2d;
-	t_poly *p_cube_polys;
+	t_point3d *p_obj_points_3d;
+	t_point2d_tf *p_obj_points_2d;
+	t_poly *p_obj_polys;
 	//t_poly *cube_polyconns;
 	int num_objects = 1;
 	int rand_x, rand_y, rand_z;
 	int rand_a, rand_b, rand_c;
 	SDL_Color tmpcol;
-#define MAXDISTANCE_V2 (BLOCKSIZE_V2 * DISTANCE_V2 * 2 + CUBES_V2)
-	//#define MAXDISTANCE_V2 (BLOCKSIZE_V2 + DISTANCE_V2 *  CUBES_V2)
+	int points_num = objs[0].num_points;
+	int polys_num = objs[0].num_polys;
+#define MAXDISTANCE_V2 (BLOCKSIZE_V2 * DISTANCE_V2 * 2 + OBJS_V2)
+	//#define MAXDISTANCE_V2 (BLOCKSIZE_V2 + DISTANCE_V2 *  OBJS_V2)
 
 	//randomnumber = rand() % MAXDISTANCE;
-	for (k = 1; k < CUBES_V2; k++) {
-		objs_v2[k].num_points = objs_v2[0].num_points;
-		objs_v2[k].num_polys = objs_v2[0].num_polys;
-		objs_v2[k].polys = cube_polys;	//global stuff
-		objs_v2[k].points_2d_tf = cube_points_2d;
-		p_cube_points_3d = (t_point3d *)malloc(8 * sizeof(t_point3d));
-		p_cube_points_2d = (t_point2d_tf *)malloc(8 * sizeof(t_point2d_tf));
-		p_cube_polys = (t_poly *)malloc(12 * sizeof(t_poly));
-		if (p_cube_points_3d == NULL || p_cube_points_2d == NULL || p_cube_polys == NULL)
+	for (k = 1; k < OBJS_V2; k++) {
+		objs[k].num_points = objs[0].num_points;
+		objs[k].num_polys = objs[0].num_polys;
+		objs[k].polys = obj_polys;	//global stuff
+		objs[k].points_2d_tf = obj_points_2d;
+		p_obj_points_3d = (t_point3d *)malloc(points_num * sizeof(t_point3d));
+		p_obj_points_2d = (t_point2d_tf *)malloc(points_num * sizeof(t_point2d_tf));
+		p_obj_polys = (t_poly *)malloc(polys_num * sizeof(t_poly));
+		if (p_obj_points_3d == NULL || p_obj_points_2d == NULL || p_obj_polys == NULL)
 			return -1;
-		objs_v2[k].points_2d_tf = p_cube_points_2d;
-		objs_v2[k].points_3d = p_cube_points_3d;
-		objs_v2[k].polys = p_cube_polys;
-		memcpy(objs_v2[k].polys, objs_v2[0].polys, 12 * sizeof(t_poly) );
+		objs[k].points_2d_tf = p_obj_points_2d;
+		objs[k].points_3d = p_obj_points_3d;
+		objs[k].polys = p_obj_polys;
+		memcpy(objs[k].polys, objs[0].polys, polys_num * sizeof(t_poly) );
 		rand_x = rand() % MAXDISTANCE_V2;
 		rand_y = rand() % MAXDISTANCE_V2;
 		rand_z = rand() % MAXDISTANCE_V2;
-		for (i = 0; i < objs_v2[0].num_points; i++) {
-			objs_v2[k].points_3d[i].x = objs_v2[0].points_3d[i].x + rand_x;
-			objs_v2[k].points_3d[i].y = objs_v2[0].points_3d[i].y + rand_y;
-			objs_v2[k].points_3d[i].z = objs_v2[0].points_3d[i].z + rand_z;
+		for (i = 0; i < objs[0].num_points; i++) {
+			objs[k].points_3d[i].x = objs[0].points_3d[i].x + rand_x;
+			objs[k].points_3d[i].y = objs[0].points_3d[i].y + rand_y;
+			objs[k].points_3d[i].z = objs[0].points_3d[i].z + rand_z;
 		}
 		//random color
 		rand_a = rand() % 255 - 50;
@@ -965,8 +1176,8 @@ int create_lot_cubes_v2(void)
 		tmpcol.g = rand_b + 50;
 		tmpcol.b = rand_c + 50;
 		tmpcol.a = 255;
-		for (i = 0; i < objs_v2[k].num_polys; i++) {
-			objs_v2[k].polys[i].color = tmpcol;
+		for (i = 0; i < objs[k].num_polys; i++) {
+			objs[k].polys[i].color = tmpcol;
 		}
 	}
 
