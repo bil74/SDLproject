@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "timer.h"
+#include "utils.h"
 
 
 #ifndef _LINUX_

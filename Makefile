@@ -3,7 +3,7 @@
 #and may not be redistributed without written permission.
 
 #OBJS specifies which files to compile as part of the project
-OBJS = sdlparts.cpp  Source.cpp  timer.cpp
+OBJS = control.cpp display.cpp main.cpp movement.cpp render.cpp timer.cpp utils.cpp config.cpp
 
 #CC specifies which compiler we're using
 CC = g++
