@@ -1,5 +1,6 @@
 # SDLproject
 basic 3d learning with SDL
+currently it only displays objects and have a movable camera
 font "Vera.ttf" needs to be copied beside the app
 
 ##windows
