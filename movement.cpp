@@ -107,7 +107,10 @@ void move_camera(void) {
 		camera.y += (frametime*speed_cam_move);
 	}
 	if (pcntvals[CNT_CAM_GO_DOWN]) {
-		camera.y -= (frametime*speed_cam_move);
+		if (camera.y > 0)
+			camera.y -= (frametime*speed_cam_move);
+		else
+			camera.y = 0;
 	}
 
 	/*

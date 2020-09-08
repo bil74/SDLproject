@@ -21,6 +21,7 @@ SDL_Color ttf_BColor;  // background color
 int screen_res_x = 800;		//render res x
 int screen_res_y = 600;		//render res y
 Uint32 *pixels;		//texture mem
+Uint32 *pixels_background;		//texture mem for sky and ground
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Texture *texture;
@@ -379,6 +380,30 @@ int sdl_start(void) {
 		return -1;
 	}
 
+	//allocate mem for it
+	pixels_background = (Uint32*)malloc(sizeof(Uint32)* screen_res_x * screen_res_y);	//Uint32[640 * 480];
+	if (pixels_background == NULL) {
+		printf("malloc pixels_background failed!\n");
+		return -1;
+	}
+	else {
+		static SDL_Color sky = { 70, 0, 0, 255 };		//blue
+		static SDL_Color ground = { 0, 70, 30, 255 };		//green
+		Uint32 *u32mem = pixels_background;
+		int i, cnt;
+
+		cnt = screen_res_x * screen_res_y / 2;
+		//sky
+		for (i = 0; i < cnt; i++) {
+			memcpy(u32mem++, &sky, sizeof(Uint32));
+		}
+		//ground
+		for (i = 0; i < cnt; i++) {
+			memcpy(u32mem++, &ground, sizeof(Uint32));
+		}
+	}
+
+
 	return 0;
 }
 
@@ -388,6 +413,8 @@ void sdl_stop(void) {
 	//close texture stuff
 	if (pixels)
 		free(pixels);
+	if (pixels_background)
+		free(pixels_background);
 	if (texture)
 		SDL_DestroyTexture(texture);
 
@@ -400,8 +427,10 @@ void sdl_stop(void) {
 
 }
 
-void setup_screen(void) {
-	memset(pixels, 0, screen_res_x * screen_res_y * sizeof(Uint32));
+void setup_screen(void)
+{
+	//memset(pixels, 0, screen_res_x * screen_res_y * sizeof(Uint32));
+	memcpy(pixels, pixels_background, screen_res_x * screen_res_y * sizeof(Uint32));
 }
 
 void display_screen(void) {

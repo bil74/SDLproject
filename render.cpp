@@ -499,7 +499,7 @@ void render_scene(t_scene *scene, t_drawpoly *drawpolys)
 		//char text2print3[100];
 		//char text2print4[100];
 		//snprintf(text2print1, sizeof(text2print1), "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
-		snprintf(text2print2, sizeof(text2print2), "fps: %.2f, objects: %d, polys drawn: %d", (float)(1000.00 / frametime), OBJS_V2, polycount);				//float
+		snprintf(text2print2, sizeof(text2print2), "fps: %.2f, objects: %d, polys drawn: %d, alt: %d", (float)(1000.00 / frametime), OBJS_V2, polycount, (int)camera.y);				//float
 																																								//snprintf(text2print3, sizeof(text2print3), "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
 																																								//snprintf(text2print4, sizeof(text2print4), "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
 

@@ -1,7 +1,7 @@
 # SDLproject
 basic 3d learning with SDL
 currently it only displays objects and have a movable camera
-font "Vera.ttf" needs to be copied beside the app
+font "lucon.ttf" needs to be copied beside the app
 
 ##windows
 #to run
@@ -17,5 +17,5 @@ font "Vera.ttf" needs to be copied beside the app
 #to run + to compile
 g++
 apt-get install libsdl2-dev
-apt-get install libsdl-ttf2.0-dev
+apt-get install libsdl2-ttf-dev
 makefile (and make.sh) included
