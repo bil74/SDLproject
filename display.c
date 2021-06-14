@@ -1,5 +1,8 @@
 #ifndef _LINUX_
 #include <windows.h>
+#include <SDL.h>
+#else
+#include </usr/include/SDL2/SDL.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,24 +15,24 @@
 #define WINDOW_TITLE "sdl3d try"
 //const char *font_file = { "C:\\Windows\\Fonts\\lucon.ttf" };
 //const char *font_file = { "Vera.ttf" };
-const char *font_file = { "lucon.ttf" };
-TTF_Font *ttf_Font; //this opens a font style and sets a size
+const char* font_file = { "lucon.ttf" };
+TTF_Font* ttf_Font; //this opens a font style and sets a size
 SDL_Color ttf_FColor;  // foreground color
 SDL_Color ttf_BColor;  // background color
 
 //definitions of external variables of this module (declared in module header)
 int screen_res_x = 800;		//render res x
 int screen_res_y = 600;		//render res y
-Uint32 *pixels;		//texture mem
-Uint32 *pixels_background;		//texture mem for sky and ground
+Uint32* pixels;		//texture mem
+Uint32* pixels_background;		//texture mem for sky and ground
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-SDL_Texture *texture;
+SDL_Texture* texture;
 //----------------------------------------------------------------------------
 
 
 //local functions
-int ttf_init_setup(char *font_fname);
+int ttf_init_setup(char* font_fname);
 
 
 // local variables
@@ -42,8 +45,8 @@ struct menuitem {
 	int level;
 	int selection;
 	int parent_id;	//parent position in the array
-	bool active;
-	bool visible;
+	SDL_bool active;
+	SDL_bool visible;
 	char text[50];
 	int conf_id;
 	int conf_val;
@@ -51,63 +54,63 @@ struct menuitem {
 
 
 struct menuitem menuitems[] = {
-/*00*/	{0, 0, -1, false, false, "main menu", -1, 0},
-/*01*/		{1, m_resume, 0, false, false, "resume", -1, 0 },
-/*02*/		{1, 0, 0, false, false, "video", -1, 0 },
-/*03*/			{2, 0, 2, false, false, "type", -1, 0 },
-/*04*/				{3, m_resume, 3, false, false, "fullscreen", fullscr, 1 },
-/*05*/				{3, m_resume, 3, false, false, "windowed", fullscr, 0 },
-/*06*/			{2, 0, 2, false, false, "window resolution", -1, 0 },
-/*07*/				{3, m_resume, 6, false, false, "resolution #1", sres_y, 0},
-/*08*/				{3, m_resume, 6, false, false, "resolution #2", sres_y, 0 },
-/*09*/				{3, m_resume, 6, false, false, "resolution #3", sres_y, 0 },
-/*10*/				{3, m_resume, 6, false, false, "resolution #4", sres_y, 0 },
-/*11*/				{3, m_resume, 6, false, false, "resolution #5", sres_y, 0 },
-/*12*/				{3, m_resume, 6, false, false, "resolution #6", sres_y, 0 },
-/*13*/				{3, m_resume, 6, false, false, "resolution #7", sres_y, 0 },
-/*14*/				{3, m_resume, 6, false, false, "resolution #8", sres_y, 0 },
-/*15*/				{3, m_resume, 6, false, false, "resolution #9", sres_y, 0 },
-/*16*/				{3, m_resume, 6, false, false, "resolution #a", sres_y, 0 },
+	/*00*/	{0, 0, -1, SDL_FALSE, SDL_FALSE, "main menu", -1, 0},
+	/*01*/		{1, m_resume, 0, SDL_FALSE, SDL_FALSE, "resume", -1, 0 },
+	/*02*/		{1, 0, 0, SDL_FALSE, SDL_FALSE, "video", -1, 0 },
+	/*03*/			{2, 0, 2, SDL_FALSE, SDL_FALSE, "type", -1, 0 },
+	/*04*/				{3, m_resume, 3, SDL_FALSE, SDL_FALSE, "fullscreen", fullscr, 1 },
+	/*05*/				{3, m_resume, 3, SDL_FALSE, SDL_FALSE, "windowed", fullscr, 0 },
+	/*06*/			{2, 0, 2, SDL_FALSE, SDL_FALSE, "window resolution", -1, 0 },
+	/*07*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #1", sres_y, 0},
+	/*08*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #2", sres_y, 0 },
+	/*09*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #3", sres_y, 0 },
+	/*10*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #4", sres_y, 0 },
+	/*11*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #5", sres_y, 0 },
+	/*12*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #6", sres_y, 0 },
+	/*13*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #7", sres_y, 0 },
+	/*14*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #8", sres_y, 0 },
+	/*15*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #9", sres_y, 0 },
+	/*16*/				{3, m_resume, 6, SDL_FALSE, SDL_FALSE, "resolution #a", sres_y, 0 },
 
 
-/*17*/			{2, 0, 2, false, false, "vsync", -1, 0 },
-/*18*/				{3, m_resume, 17, false, false, "on", vsync, 1},
-/*19*/				{3, m_resume, 17, false, false, "off", vsync, 0 },
+	/*17*/			{2, 0, 2, SDL_FALSE, SDL_FALSE, "vsync", -1, 0 },
+	/*18*/				{3, m_resume, 17, SDL_FALSE, SDL_FALSE, "on", vsync, 1},
+	/*19*/				{3, m_resume, 17, SDL_FALSE, SDL_FALSE, "off", vsync, 0 },
 
-/*20*/		{1, 0, 0, false, false, "render", -1, 0 },
-/*21*/			{2, 0, 20, false, false, "drawmode", -1, 0 },
-/*22*/				{3, m_resume, 21, false, false, "flat-shaded", drawmode, 0 },
-/*23*/				{3, m_resume, 21, false, false, "wireframe", drawmode, 1 },
+	/*20*/		{1, 0, 0, SDL_FALSE, SDL_FALSE, "render", -1, 0 },
+	/*21*/			{2, 0, 20, SDL_FALSE, SDL_FALSE, "drawmode", -1, 0 },
+	/*22*/				{3, m_resume, 21, SDL_FALSE, SDL_FALSE, "flat-shaded", drawmode, 0 },
+	/*23*/				{3, m_resume, 21, SDL_FALSE, SDL_FALSE, "wireframe", drawmode, 1 },
 
-/*24*/			{2, 0, 20, false, false, "render resolution", -1, 0 },
-/*25*/				{3, m_resume, 24, false, false, "resolution #1", rres_y, 0 },
-/*26*/				{3, m_resume, 24, false, false, "resolution #2", rres_y, 0 },
-/*27*/				{3, m_resume, 24, false, false, "resolution #3", rres_y, 0 },
-/*28*/				{3, m_resume, 24, false, false, "resolution #4", rres_y, 0 },
-/*29*/				{3, m_resume, 24, false, false, "resolution #5", rres_y, 0 },
-/*30*/				{3, m_resume, 24, false, false, "resolution #6", rres_y, 0 },
-/*31*/				{3, m_resume, 24, false, false, "resolution #7", rres_y, 0 },
-/*32*/				{3, m_resume, 24, false, false, "resolution #8", rres_y, 0 },
-/*33*/				{3, m_resume, 24, false, false, "resolution #9", rres_y, 0 },
-/*34*/				{3, m_resume, 24, false, false, "resolution #a", rres_y, 0 },
+	/*24*/			{2, 0, 20, SDL_FALSE, SDL_FALSE, "render resolution", -1, 0 },
+	/*25*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #1", rres_y, 0 },
+	/*26*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #2", rres_y, 0 },
+	/*27*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #3", rres_y, 0 },
+	/*28*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #4", rres_y, 0 },
+	/*29*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #5", rres_y, 0 },
+	/*30*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #6", rres_y, 0 },
+	/*31*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #7", rres_y, 0 },
+	/*32*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #8", rres_y, 0 },
+	/*33*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #9", rres_y, 0 },
+	/*34*/				{3, m_resume, 24, SDL_FALSE, SDL_FALSE, "resolution #a", rres_y, 0 },
 
 
-/*35*/		{1, 0, 0, false, false, "audio", -1, 0 },
-/*36*/		{1, 0, 0, false, false, "controls", -1, 0 },
-/*37*/		{1, 0, 0, false, false, "gameplay", -1, 0 },
-/*38*/		{1, m_save_conf, 0, false, false, "save setup", -1, 0 },
-/*39*/		{1, m_exit, 0, false, false, "exit", -1, 0 }
+	/*35*/		{1, 0, 0, SDL_FALSE, SDL_FALSE, "audio", -1, 0 },
+	/*36*/		{1, 0, 0, SDL_FALSE, SDL_FALSE, "controls", -1, 0 },
+	/*37*/		{1, 0, 0, SDL_FALSE, SDL_FALSE, "gameplay", -1, 0 },
+	/*38*/		{1, m_save_conf, 0, SDL_FALSE, SDL_FALSE, "save setup", -1, 0 },
+	/*39*/		{1, m_exit, 0, SDL_FALSE, SDL_FALSE, "exit", -1, 0 }
 };
 
 
 void menu_init(void)
 {
-	int i,j, k, parent;
+	int i, j, k, parent;
 	const int constint = 10;
 
 	for (i = 0, j = k = constint; i < ARRAY_SIZE(menuitems); i++) {
-		menuitems[i].visible = false;
-		menuitems[i].active = false;
+		menuitems[i].visible = SDL_FALSE;
+		menuitems[i].active = SDL_FALSE;
 		parent = menuitems[i].parent_id;
 		//fill window resolutions
 		if (parent != -1 && (memcmp(menuitems[parent].text, "window resolution", strlen("window resolution")) == 0)) {
@@ -169,33 +172,33 @@ int menu_main(void)
 		//display menu items
 		for (i = 0, ypos = 0; i < ARRAY_SIZE(menuitems); i++) {
 			char tmpstr[50];
-			bool used = false;
+			SDL_bool used = SDL_FALSE;
 
 			//set defaults
-			menuitems[i].visible = false;
-			menuitems[i].active = false;
+			menuitems[i].visible = SDL_FALSE;
+			menuitems[i].active = SDL_FALSE;
 
 			//set visible if its in the active history
 			for (j = 0; j < currlevel; j++) {
 				if (i == activelist[j])
-					menuitems[i].visible = true;
+					menuitems[i].visible = SDL_TRUE;
 			}
 
 			//set visible if parent is the last in activelist
-			if (menuitems[i].parent_id == activelist[currlevel-1])
-				menuitems[i].visible = true;
+			if (menuitems[i].parent_id == activelist[currlevel - 1])
+				menuitems[i].visible = SDL_TRUE;
 
 			//set active
 			if (activeindex == i)
-				menuitems[i].active = true;
+				menuitems[i].active = SDL_TRUE;
 
 			//set used flag for remarking current values
 			if (get_conf_val(menuitems[i].conf_id) == menuitems[i].conf_val)
-				used = true;
+				used = SDL_TRUE;
 
 			//display if visible
 			if (menuitems[i].visible) {
-				snprintf(tmpstr, sizeof(tmpstr), "%s%s", menuitems[i].text, used ? "(*)":"");
+				snprintf(tmpstr, sizeof(tmpstr), "%s%s", menuitems[i].text, used ? "(*)" : "");
 				display_text(menuitems[i].level, ypos++, tmpstr, menuitems[i].active ? col_txt_active : col_txt_inactive);
 			}
 
@@ -207,13 +210,13 @@ int menu_main(void)
 			;
 
 		//controls for menu
-		switch (keypressed){
+		switch (keypressed) {
 		case CNT_USE:			//go down into child-menu
 		case CNT_CAM_ROT_RIGHT:
 			if (menuitems[activeindex + 1].parent_id == activeindex) {
 				activelist[++currlevel] = ++activeindex;
 			}
-			else if  (menuitems[activeindex].selection) {
+			else if (menuitems[activeindex].selection) {
 				//change config values if needed
 				if (menuitems[activeindex].conf_id != -1) {
 					set_conf_val(menuitems[activeindex].conf_id, menuitems[activeindex].conf_val);
@@ -238,7 +241,7 @@ int menu_main(void)
 				if (menuitems[activeindex].parent_id == menuitems[i].parent_id) {
 					activelist[currlevel] = i;
 					break;
-			}
+				}
 			break;
 		case CNT_CAM_GO_FORWARD:	//up
 			for (i = activeindex - 1; i >= 0; i--)
@@ -250,7 +253,7 @@ int menu_main(void)
 		}
 
 		//wait for keypress-release
-		while ( fill_controls() == keypressed)
+		while (fill_controls() == keypressed)
 			;
 
 
@@ -288,11 +291,11 @@ int sdl_lowlev_start(void)
 
 	//printf("%s; SDL_GetNumVideoDisplays():%d\n", __func__, SDL_GetNumVideoDisplays());
 	//printf("%s; SDL_GetNumDisplayModes():%d\n", __func__, SDL_GetNumDisplayModes(0));
-	
+
 	//save screen native resolution
 	screen_native_xres = mode.w;
 	screen_native_yres = mode.h;
-	
+
 
 	//init SDL TrueType fonts to write to screen
 	if (TTF_Init() == -1)
@@ -304,7 +307,7 @@ int sdl_lowlev_start(void)
 		printf("TTF load font \"%s\" failed!\n", (char*)font_file);
 		return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -322,7 +325,7 @@ int sdl_start(void) {
 	screen_res_window_y = get_conf_val(sres_y);
 	screen_res_window_x = (get_conf_val(sres_y) * screen_native_xres) / screen_native_yres;
 	//printf("%s; #1 screen_res_window_x:%d, screen_res_window_y:%d\n", __func__, screen_res_window_x, screen_res_window_y);
-	
+
 	//calculate render resolution
 	screen_res_y = get_conf_val(rres_y);
 	screen_res_x = (get_conf_val(rres_y) * screen_native_xres) / screen_native_yres;
@@ -372,16 +375,16 @@ int sdl_start(void) {
 		printf("creating texture failed!\n");
 		return -1;
 	}
-	
+
 	//allocate mem for it
-	pixels = (Uint32*) malloc(sizeof(Uint32)* screen_res_x * screen_res_y);	//Uint32[640 * 480];
+	pixels = (Uint32*)malloc(sizeof(Uint32) * screen_res_x * screen_res_y);	//Uint32[640 * 480];
 	if (pixels == NULL) {
 		printf("malloc pixels failed!\n");
 		return -1;
 	}
 
 	//allocate mem for it
-	pixels_background = (Uint32*)malloc(sizeof(Uint32)* screen_res_x * screen_res_y);	//Uint32[640 * 480];
+	pixels_background = (Uint32*)malloc(sizeof(Uint32) * screen_res_x * screen_res_y);	//Uint32[640 * 480];
 	if (pixels_background == NULL) {
 		printf("malloc pixels_background failed!\n");
 		return -1;
@@ -389,7 +392,7 @@ int sdl_start(void) {
 	else {
 		static SDL_Color sky = { 70, 0, 0, 255 };		//blue
 		static SDL_Color ground = { 0, 70, 30, 255 };		//green
-		Uint32 *u32mem = pixels_background;
+		Uint32* u32mem = pixels_background;
 		int i, cnt;
 
 		cnt = screen_res_x * screen_res_y / 2;
@@ -437,24 +440,24 @@ void display_screen(void) {
 	SDL_RenderPresent(renderer);
 }
 
-int ttf_init_setup(char *font_file) {
+int ttf_init_setup(char* font_file) {
 	//set defaults
 	ttf_Font = TTF_OpenFont(font_file, 24); //this opens a font style and sets a size
-	ttf_FColor = { 255, 162, 0, SDL_ALPHA_OPAQUE };  // foreground color
-	ttf_BColor = { 0, 0, 0, SDL_ALPHA_OPAQUE };  // background color
+	ttf_FColor = (SDL_Color){ 255, 162, 0, SDL_ALPHA_OPAQUE };  // foreground color
+	ttf_BColor = (SDL_Color){ 0, 0, 0, SDL_ALPHA_OPAQUE };  // background color
 	if (ttf_Font == NULL) {
-	    return -1;
+		return -1;
 	}
 	return 0;
 
 }
 
-void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color color)
+void display_text(int screen_column, int screen_row, char* text2disp, SDL_Color color)
 {
 	//font sizes are fix
 	int font_height = 15;
 	int font_width = 10;
-	
+
 	//set render resolution for any text displayed
 	if (get_conf_val(fullscr) == 1)
 		SDL_RenderSetLogicalSize(renderer, screen_native_xres, screen_native_yres);
@@ -464,7 +467,7 @@ void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color 
 	//printf("%s; font_height:%d, font_width:%d\n", __func__, font_height, font_width);
 
 
-	SDL_Surface *surfaceMessage = TTF_RenderText_Shaded(ttf_Font, text2disp, color, ttf_BColor); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+	SDL_Surface* surfaceMessage = TTF_RenderText_Shaded(ttf_Font, text2disp, color, ttf_BColor); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
 
 																								 //printf("surfaceMessage:%p\n", surfaceMessage);
 
@@ -491,8 +494,8 @@ void display_text(int screen_column, int screen_row, char *text2disp, SDL_Color 
 	//Don't forget too free your surface and texture
 	SDL_DestroyTexture(Message);
 	SDL_FreeSurface(surfaceMessage);
-	
-	
+
+
 	//restore render resolution
 	SDL_RenderSetLogicalSize(renderer, screen_res_x, screen_res_y);
 

@@ -5,7 +5,7 @@
 
 
 // --------------------------- public declarations
-extern bool dbg_global;
+extern SDL_bool dbg_global;
 extern INT64 timer_main;
 
 

@@ -1,6 +1,6 @@
 #ifndef _LINUX_
-using namespace std;
-#include <iostream>
+//using namespace std;
+//#include <iostream>
 #include <windows.h>
 #include <SDL.h>
 #else
@@ -10,6 +10,7 @@ using namespace std;
 #include </usr/include/SDL2/SDL_ttf.h>
 #include <inttypes.h>
 #endif
+#include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include "main.h"
@@ -23,10 +24,10 @@ using namespace std;
 
 
 //definitions of external variables of this module (declared in module header)
-bool dbg_global = false;
+SDL_bool dbg_global = SDL_FALSE;
 INT64 timer_main;
-bool done = false;
-bool restart_sdl = false;
+SDL_bool done = SDL_FALSE;
+SDL_bool restart_sdl = SDL_FALSE;
 
 //----------------------------------------------------------------------------
 
@@ -60,10 +61,10 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-			
-	while (!done) 
+
+	while (!done)
 	{
-		//restart_sdl = false;
+		//restart_sdl = SDL_FALSE;
 		setup_screen();
 
 		//render scene to texture
@@ -97,21 +98,21 @@ void do_menu_stuff(int menu_selection)
 	//printf("%s; menu_selection:%d\n", __func__, menu_selection);
 	switch (menu_selection) {
 	case m_exit:
-		done = true;
+		done = SDL_TRUE;
 		break;
 	case m_save_conf:
 		config_save();
 		break;
 	case m_resume:
-		if (is_config_changed(SUBSYS_SDL, FLAG_APPLY, true)) {		//if sdl params changed, restart sdl
+		if (is_config_changed(SUBSYS_SDL, FLAG_APPLY, SDL_TRUE)) {		//if sdl params changed, restart sdl
 			sdl_stop();
 			if (sdl_start() != 0)
-				done = 1;
+				done = SDL_TRUE;
 		}
-		if (is_config_changed(SUBSYS_RND, FLAG_APPLY, true)) {		//if render params changed, restart render
+		if (is_config_changed(SUBSYS_RND, FLAG_APPLY, SDL_TRUE)) {		//if render params changed, restart render
 			stop_render();
 			if (start_render() != 0)
-				done = 1;
+				done = SDL_TRUE;
 		}
 		break;
 	default:

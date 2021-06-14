@@ -22,6 +22,6 @@ extern int config_save();
 
 int get_conf_val(int conf_id);
 int set_conf_val(int conf_id, int conf_val);
-int is_config_changed(int subsys, int change_level, bool reset);
+int is_config_changed(int subsys, int change_level, SDL_bool reset);
 
 #endif //_CONFIG_H_

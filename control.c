@@ -1,6 +1,6 @@
 #ifndef _LINUX_
-using namespace std;
-#include <iostream>
+//using namespace std;
+//#include <iostream>
 #include <windows.h>
 #include <SDL.h>
 #else
@@ -19,7 +19,7 @@ int control_method = CMETHOD_KEYBOARD;		//0-key, 1-gamepad
 Uint8 cntvals[MAX_CONTROLS];
 
 //definitions of external variables of this module (declared in module header)
-Uint8 *pcntvals = cntvals;
+Uint8* pcntvals = cntvals;
 //unsigned char *pcntvals = cntvals;
 //----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ Uint8 *pcntvals = cntvals;
 int fill_controls(void)
 {
 	int retval;
-	const Uint8 *keystates = SDL_GetKeyboardState(NULL);	//get key states
+	const Uint8* keystates = SDL_GetKeyboardState(NULL);	//get key states
 	int key_multiplier = 1;		//key should use 100 here and gamepad could use values below (later)
 
 	SDL_PumpEvents();	//actualize events

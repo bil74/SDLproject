@@ -45,7 +45,7 @@ typedef struct {
 	signed int x;
 	signed int y;
 	signed int z;	//save depth
-	bool valid;
+	SDL_bool valid;
 }t_point2d_tf;
 
 
@@ -62,6 +62,7 @@ typedef struct {
 	int num_points;
 	int num_polys;
 	t_point3d *points_3d;
+	t_point3d *points_3d_prep;
 	t_point2d_tf *points_2d_tf;
 	t_poly *polys;
 }t_obj;

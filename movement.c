@@ -1,6 +1,6 @@
 #ifndef _LINUX_
-using namespace std;
-#include <iostream>
+//using namespace std;
+//#include <iostream>
 #include <windows.h>
 #include <SDL.h>
 #else
@@ -39,7 +39,7 @@ void move_camera(void) {
 	double frametime;							//
 	double val;
 	val = PI / 180;
-	const Uint8 *keystates = SDL_GetKeyboardState(NULL);	//get key states
+	const Uint8* keystates = SDL_GetKeyboardState(NULL);	//get key states
 	double rot_step;										//rotation step in degree
 	double tx = camera.uvect.vx;
 	double ty = camera.uvect.vy;
@@ -73,14 +73,14 @@ void move_camera(void) {
 		//camera.uvect.vz = (cos(rot_step*val) * tz) - (sin(rot_step*val) * tx);
 
 		//computing camera unit vector based on default camera unit vector
-		camera.uvect.vx = (cos(camera.roty*val) * camera.uvect_default.vx) + (sin(camera.roty*val) * camera.uvect_default.vz);
-		camera.uvect.vz = (cos(camera.roty*val) * camera.uvect_default.vz) - (sin(camera.roty*val) * camera.uvect_default.vx);
-		camera.cx = cos(camera.rotx*val);
-		camera.sx = sin(camera.rotx*val);
-		camera.cy = cos(camera.roty*val);
-		camera.sy = sin(camera.roty*val);
-		camera.cz = cos(camera.rotz*val);
-		camera.sz = sin(camera.rotz*val);
+		camera.uvect.vx = (cos(camera.roty * val) * camera.uvect_default.vx) + (sin(camera.roty * val) * camera.uvect_default.vz);
+		camera.uvect.vz = (cos(camera.roty * val) * camera.uvect_default.vz) - (sin(camera.roty * val) * camera.uvect_default.vx);
+		camera.cx = cos(camera.rotx * val);
+		camera.sx = sin(camera.rotx * val);
+		camera.cy = cos(camera.roty * val);
+		camera.sy = sin(camera.roty * val);
+		camera.cz = cos(camera.rotz * val);
+		camera.sz = sin(camera.rotz * val);
 
 	}
 	if (pcntvals[CNT_CAM_GO_FORWARD]) {
@@ -90,8 +90,8 @@ void move_camera(void) {
 		camera.x += (sin(camera.roty*val) * (frametime*speed_cam_move));
 		*/
 		//working with unit vector of camera
-		camera.z += (camera.uvect.vz * (frametime*speed_cam_move));
-		camera.x += (camera.uvect.vx * (frametime*speed_cam_move));
+		camera.z += (camera.uvect.vz * (frametime * speed_cam_move));
+		camera.x += (camera.uvect.vx * (frametime * speed_cam_move));
 	}
 	if (pcntvals[CNT_CAM_GO_BACKWARD]) {
 		/*
@@ -99,16 +99,16 @@ void move_camera(void) {
 		camera.x -= (sin(camera.roty*val) * (frametime*speed_cam_move));
 		*/
 
-		camera.z -= (camera.uvect.vz * (frametime*speed_cam_move));
-		camera.x -= (camera.uvect.vx * (frametime*speed_cam_move));
+		camera.z -= (camera.uvect.vz * (frametime * speed_cam_move));
+		camera.x -= (camera.uvect.vx * (frametime * speed_cam_move));
 	}
 
 	if (pcntvals[CNT_CAM_GO_UP]) {
-		camera.y += (frametime*speed_cam_move);
+		camera.y += (frametime * speed_cam_move);
 	}
 	if (pcntvals[CNT_CAM_GO_DOWN]) {
 		if (camera.y > 0)
-			camera.y -= (frametime*speed_cam_move);
+			camera.y -= (frametime * speed_cam_move);
 		else
 			camera.y = 0;
 	}
@@ -116,19 +116,19 @@ void move_camera(void) {
 	/*
 	//ESC
 	if (pcntvals[CNT_ESCAPE]) {
-		done_global = true;
+		done_global = SDL_TRUE;
 	}
 	//testkey
 	if (pcntvals[CNT_BACKSPACE]) {
-		menu_global = true;
+		menu_global = SDL_TRUE;
 	}
 	*/
 	//debug stuff
 	if (keystates[SDL_SCANCODE_RETURN]) {
-		dbg_global = true;
+		dbg_global = SDL_TRUE;
 	}
 	else
-		dbg_global = false;
+		dbg_global = SDL_FALSE;
 
 
 

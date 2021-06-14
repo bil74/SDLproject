@@ -1,0 +1,103 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		
+
+		{
+			"type": "cppbuild",
+			//"label": "C/C++: gcc.exe build active file 32bit",
+			"label": "Win32_task_rel",
+			"command": "C:\\programs\\tdm-gcc\\10-3-0\\bin\\gcc.exe",
+			//"command": "C:\\TDM-GCC-64\\bin\\gcc.exe",
+			"args": [
+				"-O2",
+				"-m32",
+				"-pedantic",
+				"-IC:\\programs\\libraries\\SDL2-2.0.9\\include",
+				"-IC:\\programs\\libraries\\SDL2_ttf-2.0.15\\include",
+				"-DWIN32",
+				"-DSDL_MAIN_HANDLED",
+				"-D_CONSOLE",
+				//"-D_DEBUG",
+				//"${file}",
+				"config.c",
+				"control.c",
+				"display.c",
+				"main.c",
+				"movement.c",
+				"render.c",
+				"timer.c",
+				"utils.c",
+				//"line_tool.c",
+				"-m32",
+				"-LC:\\programs\\libraries\\SDL2-2.0.9\\lib\\x86",
+				"-LC:\\programs\\libraries\\SDL2_ttf-2.0.15\\lib\\x86",
+				"-lSDL2",
+				"-lSDL2_ttf",
+				"-o",
+				//"${fileDirname}\\32bit\\${fileBasenameNoExtension}.exe"
+				"${workspaceFolder}\\sdlproject_rel.exe"
+				//"${fileDirname}\\newpos.exe"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "C:\\programs\\tdm-gcc\\10-3-0\\bin\\gcc.exe"
+			//"detail": "C:\\TDM-GCC-64\\bin\\gcc.exe"
+		},
+
+
+
+		{
+			"type": "cppbuild",
+			//"label": "C/C++: gcc.exe build active file 32bit",
+			"label": "Win32_task_dbg",
+			"command": "C:\\programs\\tdm-gcc\\10-3-0\\bin\\gcc.exe",
+			//"command": "C:\\TDM-GCC-64\\bin\\gcc.exe",
+			"args": [
+				"-g",
+				"-m32",
+				"-pedantic",
+				"-IC:\\programs\\libraries\\SDL2-2.0.9\\include",
+				"-IC:\\programs\\libraries\\SDL2_ttf-2.0.15\\include",
+				"-DWIN32",
+				"-DSDL_MAIN_HANDLED",
+				"-D_CONSOLE",
+				"-D_DEBUG",
+				//"${file}",
+				"config.c",
+				"control.c",
+				"display.c",
+				"main.c",
+				"movement.c",
+				"render.c",
+				"timer.c",
+				"utils.c",
+				//"line_tool.c",
+				"-m32",
+				"-LC:\\programs\\libraries\\SDL2-2.0.9\\lib\\x86",
+				"-LC:\\programs\\libraries\\SDL2_ttf-2.0.15\\lib\\x86",
+				"-lSDL2",
+				"-lSDL2_ttf",
+				"-o",
+				//"${fileDirname}\\32bit\\${fileBasenameNoExtension}.exe"
+				"${workspaceFolder}\\sdlproject_dbg.exe"
+				//"${fileDirname}\\newpos.exe"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "C:\\programs\\tdm-gcc\\10-3-0\\bin\\gcc.exe"
+			//"detail": "C:\\TDM-GCC-64\\bin\\gcc.exe"
+		}
+
+	]
+}

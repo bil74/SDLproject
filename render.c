@@ -1,6 +1,6 @@
 #ifndef _LINUX_
-using namespace std;
-#include <iostream>
+//using namespace std;
+//#include <iostream>
 #include <windows.h>
 #include <SDL.h>
 #else
@@ -12,6 +12,7 @@ using namespace std;
 #endif
 #include <math.h>
 #include <time.h>
+#include <stdio.h>
 #include "main.h"
 #include "timer.h"
 #include "display.h"
@@ -21,7 +22,7 @@ using namespace std;
 #include "config.h"
 
 
-#define OBJS_V2 100
+#define OBJS_V2 50
 
 //definitions of external variables of this module (declared in module header)
 //----------------------------------------------------------------------------
@@ -29,6 +30,52 @@ using namespace std;
 //timers
 INT64 timer_refr_txt = 0;
 INT64 timer_frame = 0;
+
+
+/*
+// ----------------------------------------------------- blender object v2
+t_point3d obj_points_3d[] = {
+{ -2887, 25, 2841 },
+{ -2887, -25, 2841 },
+{ -2887, 25, -2841 },
+{ -2887, -25, -2841 },
+{ 2887, 25, 2841 },
+{ 2887, -25, 2841 },
+{ 2887, 25, -2841 },
+{ 2887, -25, -2841 }
+
+};
+//testing start
+t_point3d obj_points_3d_prep[ARRAY_SIZE(obj_points_3d)] = { 0 };
+//testing end
+t_point2d_tf obj_points_2d[ARRAY_SIZE(obj_points_3d)] = { 0 };
+
+t_poly obj_polys[] = {
+	//front, up, right
+	{ 4, 2, 0, { 255,255,255,255 },0,{ 0,0,0 } } ,		//use only this to draw one triange
+	
+	//{ 3, 8, 4, { 255,255,0,255 },0,{ 0,0,0 } } ,
+	//{ 7, 6, 8, { 255,255,255,255 },0,{ 0,0,0 } } ,
+	//{ 2, 8, 6, { 0,0,255,255 },0,{ 0,0,0 } } ,
+	//{ 1, 4, 2, { 0,255,255,255 },0,{ 0,0,0 } } ,
+	//{ 5, 2, 6, { 255,0,255,255 },0,{ 0,0,0 } } ,
+	//{ 5, 7, 3, { 155,255,255,255 },0,{ 0,0,0 } } ,
+	//{ 3, 7, 8, { 255,155,255,255 },0,{ 0,0,0 } } ,
+	//{ 7, 5, 6, { 255,255,155,255 },0,{ 0,0,0 } } ,
+	//{ 2, 4, 8, { 155,255,155,255 },0,{ 0,0,0 } } ,
+	//{ 1, 3, 4, { 255,155,155,255 },0,{ 0,0,0 } } ,
+	//{ 5, 1, 2, { 155,055,255,255 },0,{ 0,0,0 } } ,
+};
+
+t_obj objs[OBJS_V2] = {
+	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_3d_prep, obj_points_2d, obj_polys }
+};
+t_scene scene = {
+	{ -1000, -1000, -1000 },
+	OBJS_V2,
+	objs
+};
+*/
 
 
 
@@ -91,6 +138,9 @@ t_point3d obj_points_3d[] = {
 { 72   ,    12    ,    -140 }
 };
 
+//testing start
+t_point3d obj_points_3d_prep[ARRAY_SIZE(obj_points_3d)] = { 0 };
+//testing end
 t_point2d_tf obj_points_2d[ARRAY_SIZE(obj_points_3d)] = { 0 };
 
 t_poly obj_polys[] = {
@@ -195,7 +245,7 @@ t_poly obj_polys[] = {
 };
 
 t_obj objs[OBJS_V2] = {
-	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_2d, obj_polys }
+	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_3d_prep, obj_points_2d, obj_polys }
 };
 t_scene scene = {
 	{ -1000,-1000,-1000 },
@@ -217,13 +267,18 @@ t_scene scene = {
 // ----------------------------------------------------- cube object v2
 t_point3d obj_points_3d[] = { { -100, -100, -100 }, { -100, 100, -100 }, { 100, 100, -100 }, { 100, -100, -100 },
 { -100, -100,  100 }, { -100, 100,  100 }, { 100, 100,  100 }, { 100, -100,  100 } };
+//testing start
+t_point3d obj_points_3d_prep[ARRAY_SIZE(obj_points_3d)] = { 0 };
+//testing end
+
 t_point2d_tf obj_points_2d[ARRAY_SIZE(obj_points_3d)] = {0};
 t_poly obj_polys[] = { { 0,1,2 ,{255,255,255,0},0, {0,0,0}}, { 2,3,0 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 6,5,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,7,6 ,{ 255,255,255,0 },0,{ 0,0,0 } },
 { 2,6,7 ,{ 255,255,255,0 },0, { 0,0,0 } }, { 3,2,7 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 4,5,1 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 1,0,4 ,{ 255,255,255,0 },0,{ 0,0,0 } },
 { 5,6,2 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 2,1,5 ,{ 255,255,255,0 },0,{ 0,0,0 } },  { 3,7,4 ,{ 255,255,255,0 },0,{ 0,0,0 } }, { 4,0,3 ,{ 255,255,255,0 },0,{ 0,0,0 } } };
 
 t_obj objs[OBJS_V2] = {
-{ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_2d, obj_polys}
+//{ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_2d, obj_polys}
+	{ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_3d_prep, obj_points_2d, obj_polys}
 };
 
 t_scene scene = {
@@ -236,7 +291,7 @@ objs
 
 
 t_camera camera = {
-	0,0,-1500,   0,0,0,   0,0,0,0,0,0,   0,{ 0,0,1 },{ 0,0,1 }
+	0,0,-1500,   0,0,0,   0,0,0,0,0,0,   0,{ 0,0,1 },{ 0,0,1 }		//orig 0,0,-1500
 };
 
 double sindeg[360 + 1];
@@ -249,20 +304,22 @@ void testing(void);
 
 
 //local render functions
-void transform_object(t_obj *object, t_point3d *lightpos, t_drawpoly **dpoly);
-int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_drawpoly *draw_data);
-void sort_dpolys(t_drawpoly *p_draw_array, int count);
-void draw_dpolys(t_drawpoly *p_draw_array, int count);
-void drawpoly_fill(t_drawpoly *draw);
-void drawpoly_wire(t_drawpoly *draw);	//wire
-void drawline_pixelmem_OLD(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color);
-void drawline_pixelmem(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color);	//wire
-int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point *memloc);
-int backface_culling(t_poly *p_poly, t_point3d *p_points3d);
-void transform_points(t_obj *object);
-int set_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_drawpoly *p_draw_data);
-void set_color(t_poly *p_poly, t_point3d *p_points3d, t_point3d *p_lightpos, t_drawpoly *p_draw_data);
-void draw_horizontal_line(Uint32 *pixelmem, SDL_Color color, SDL_Point *points);
+void transform_object(t_obj* object, t_point3d* lightpos, t_drawpoly** dpoly);
+int prepare_poly(t_poly* p_poly, t_obj* object, t_point3d* p_lightpos, t_drawpoly* draw_data);
+void sort_dpolys(t_drawpoly* p_draw_array, int count);
+void draw_dpolys(t_drawpoly* p_draw_array, int count);
+void drawpoly_fill(t_drawpoly* draw);
+void drawpoly_wire(t_drawpoly* draw);	//wire
+//void drawline_pixelmem_OLD(Uint32* pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color);
+void drawline_pixelmem(Uint32* pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color);	//wire
+int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point* memloc);
+int backface_culling(t_poly* p_poly, t_point3d* p_points3d);
+int backface_culling_NEW_BAD(t_poly* p_poly, t_point3d* p_points3d);
+void transform_points(t_obj* object);
+int set_screen_coords(t_poly* p_poly, t_point2d_tf* p_points2d_tf, t_drawpoly* p_draw_data);
+void set_color(t_poly* p_poly, t_point3d* p_points3d, t_point3d* p_lightpos, t_drawpoly* p_draw_data);
+void draw_horizontal_line(Uint32* pixelmem, SDL_Color color, SDL_Point* points);
+int transform_to_2d_and_clip_to_near_plane(t_poly* p_poly, t_point3d* p_points3d_prep, t_point2d_tf* savepoints);
 
 //local vector functions
 t_vector vector_unitize(t_vector input);
@@ -274,7 +331,7 @@ int create_lot_objs_v2(void);
 int sign(int x);
 
 
-t_drawpoly *p_dpolys;	//must include here as well
+t_drawpoly* p_dpolys;	//must include here as well
 
 
 SDL_Color col_texts = { 255, 159, 114, 255 };			//brown-ish
@@ -320,10 +377,10 @@ int init_some_stuff(void)
 	srand((unsigned int)time(NULL));
 
 	//create_lot_cubes();
-
+	
 	if (create_lot_objs_v2() == -1)
 		return -1;
-
+	
 
 
 	//init timer
@@ -339,8 +396,8 @@ int init_some_stuff(void)
 		double val = PI / 180;
 
 		for (i = 0; i <= 360; i++) {
-			sindeg[i] = sin(i*val);
-			cosdeg[i] = cos(i*val);
+			sindeg[i] = sin(i * val);
+			cosdeg[i] = cos(i * val);
 		}
 	}
 
@@ -384,7 +441,8 @@ int init_some_stuff(void)
 				if (normvect.vy == -0)
 					normvect.vy = 0;
 				if (normvect.vz == -0)
-					normvect.vz = 0;
+					if (normvect.vz == -0)
+						normvect.vz = 0;
 
 				//save normal to object
 				scene.objects[j].polys[i].uvect_normal.vx = normvect.vx;
@@ -414,7 +472,7 @@ int init_some_stuff(void)
 		}
 
 		//allocate memory
-		p_dpolys = (t_drawpoly *)malloc(max_polys * sizeof(t_drawpoly));
+		p_dpolys = (t_drawpoly*)malloc(max_polys * sizeof(t_drawpoly));
 		if (p_dpolys == NULL) {
 			printf("malloc mem for polys to sort failed!\n");
 			return -1;
@@ -426,12 +484,12 @@ int init_some_stuff(void)
 	{
 		double val = PI / 180;
 
-		camera.cx = cos(camera.rotx*val);
-		camera.sx = sin(camera.rotx*val);
-		camera.cy = cos(camera.roty*val);
-		camera.sy = sin(camera.roty*val);
-		camera.cz = cos(camera.rotz*val);
-		camera.sz = sin(camera.rotz*val);
+		camera.cx = cos(camera.rotx * val);
+		camera.sx = sin(camera.rotx * val);
+		camera.cy = cos(camera.roty * val);
+		camera.sy = sin(camera.roty * val);
+		camera.cz = cos(camera.rotz * val);
+		camera.sz = sin(camera.rotz * val);
 	}
 
 	return 0;
@@ -445,6 +503,7 @@ void close_some_stuff(void)
 	for (k = 1; k < OBJS_V2; k++) {
 		free(objs[k].points_2d_tf);
 		free(objs[k].points_3d);
+		free(objs[k].points_3d_prep);
 		free(objs[k].polys);
 	}
 
@@ -458,15 +517,15 @@ void close_some_stuff(void)
 
 
 //v2 stuff
-void render_scene(t_scene *scene, t_drawpoly *drawpolys)
+void render_scene(t_scene* scene, t_drawpoly* drawpolys)
 {
 #define DSPTIME 1000						//refresh interval for frametime (millisec)
 	static double frametime, sleeptime;
 	static int num_of_frames;
 
-	t_obj *p_obj;
+	t_obj* p_obj;
 	int polycount = 0;
-	t_drawpoly *dpoly = drawpolys;
+	t_drawpoly* dpoly = drawpolys;
 
 	//go through objects
 	for (p_obj = scene->objects; p_obj < (scene->objects + scene->num_objects); p_obj++) {
@@ -493,20 +552,43 @@ void render_scene(t_scene *scene, t_drawpoly *drawpolys)
 
 	//print some stuff to the screen
 	{
+		t_drawpoly* pdp = drawpolys;
 		int ypos = 0;
-		//char text2print1[100];
+		char text2print1[100];
 		char text2print2[100];
-		//char text2print3[100];
-		//char text2print4[100];
+		char text2print3[100];
+		char text2print4[100];
 		//snprintf(text2print1, sizeof(text2print1), "cam x=%.0f, y=%.0f, z=%.0f, rot-x:%.0f, rot-y:%.0f, rot-z:%.0f", camera.x, camera.y, camera.z, camera.rotx, camera.roty, camera.rotz);
-		snprintf(text2print2, sizeof(text2print2), "fps: %.2f, objects: %d, polys drawn: %d, alt: %d", (float)(1000.00 / frametime), OBJS_V2, polycount, (int)camera.y);				//float
-																																								//snprintf(text2print3, sizeof(text2print3), "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
-																																								//snprintf(text2print4, sizeof(text2print4), "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
+		snprintf(text2print1, sizeof(text2print1), "fps: %.2f, objects: %d, polys drawn: %d, alt: %d", (float)(1000.00 / frametime), OBJS_V2, polycount, (int)camera.y);				//float
 
-																																								//display_text(0, ypos++, text2print1, col_texts);	//camera data
+		/*
+		snprintf(text2print2, sizeof(text2print2), "3dpoints[0] 0(x%d y%d z%d) 1(x%d y%d z%d) 2(x%d y%d z%d)"
+			, scene->objects[0].points_3d[0].x, scene->objects[0].points_3d[0].y, scene->objects[0].points_3d[0].z
+			, scene->objects[0].points_3d[1].x, scene->objects[0].points_3d[1].y, scene->objects[0].points_3d[1].z
+			, scene->objects[0].points_3d[2].x, scene->objects[0].points_3d[2].y, scene->objects[0].points_3d[2].z
+		);
+		snprintf(text2print3, sizeof(text2print3), "3dprep[0]  0(x%d y%d z%d) 1(x%d y%d z%d) 2(x%d y%d z%d)"
+			, scene->objects[0].points_3d_prep[0].x, scene->objects[0].points_3d_prep[0].y, scene->objects[0].points_3d_prep[0].z
+			, scene->objects[0].points_3d_prep[1].x, scene->objects[0].points_3d_prep[1].y, scene->objects[0].points_3d_prep[1].z
+			, scene->objects[0].points_3d_prep[2].x, scene->objects[0].points_3d_prep[2].y, scene->objects[0].points_3d_prep[2].z
+		);
+
+		snprintf(text2print4, sizeof(text2print4), "dpoly[0]   0(x%d y%d) 1(x%d y%d) 2(x%d y%d)"
+			, pdp[0].points[0].x, pdp[0].points[0].y
+			, pdp[0].points[1].x, pdp[0].points[1].y
+			, pdp[0].points[2].x, pdp[0].points[2].y
+		);
+		*/
+		//snprintf(text2print3, sizeof(text2print3), "camera unit vector x=%.2f, y=%.2f, z=%.2f", camera.uvect.vx, camera.uvect.vy, camera.uvect.vz);
+		//snprintf(text2print4, sizeof(text2print4), "lightpos = %d, %d, %d", scene->lightpos.x, scene->lightpos.y, scene->lightpos.z);
+
+		//display_text(0, ypos++, text2print1, col_texts);	//camera data
+		display_text(0, ypos++, text2print1, col_texts);	//fps & co
+		/*
 		display_text(0, ypos++, text2print2, col_texts);	//fps & co
-															//display_text(0, ypos++, text2print3, col_texts);	//OTHER
-															//display_text(0, ypos++, text2print4, col_texts);	//light source
+		display_text(0, ypos++, text2print3, col_texts);	//OTHER
+		display_text(0, ypos++, text2print4, col_texts);	//light source
+		*/
 	}
 
 
@@ -515,9 +597,9 @@ void render_scene(t_scene *scene, t_drawpoly *drawpolys)
 
 
 
-void transform_object(t_obj *object, t_point3d *lightpos, t_drawpoly **dpoly)
+void transform_object(t_obj* object, t_point3d* lightpos, t_drawpoly** dpoly)
 {
-	t_poly *p_poly;
+	t_poly* p_poly;
 
 	//points belong to objects, so transform them here
 	transform_points(object);
@@ -533,7 +615,7 @@ void transform_object(t_obj *object, t_point3d *lightpos, t_drawpoly **dpoly)
 }
 
 
-void transform_points(t_obj *object)
+void transform_points(t_obj* object)
 {
 	int i, x, y, z, tx, ty, tz;
 	for (i = 0; i < object->num_points; i++) {
@@ -554,14 +636,20 @@ void transform_points(t_obj *object)
 		x = (int)((camera.cz * tx) - (camera.sz * ty));
 		y = (int)((camera.cz * ty) + (camera.sz * tx));
 
+		//testing start
+		object->points_3d_prep[i].x = x;
+		object->points_3d_prep[i].y = y;
+		object->points_3d_prep[i].z = z;
+		//testing end
+
 		//translate to 2d
 		if (z > 0) {
-			object->points_2d_tf[i].valid = true;
+			object->points_2d_tf[i].valid = SDL_TRUE;
 			object->points_2d_tf[i].x = (int)((x * persp_value) / z);
 			object->points_2d_tf[i].y = (int)((y * persp_value) / z);
 		}
 		else
-			object->points_2d_tf[i].valid = false;
+			object->points_2d_tf[i].valid = SDL_FALSE;
 
 		//save depth for transformed 2d point (uses for sorting)
 		object->points_2d_tf[i].z = z;
@@ -572,14 +660,13 @@ void transform_points(t_obj *object)
 
 
 
-int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_drawpoly *draw_data)
+int prepare_poly_OLD(t_poly* p_poly, t_obj* object, t_point3d* p_lightpos, t_drawpoly* draw_data)
 //return value
 //0: must be drawn
 {
 
 	if (backface_culling(p_poly, object->points_3d) != 0)
 		return -1;		//not visible
-
 
 	if (set_screen_coords(p_poly, object->points_2d_tf, draw_data) != 0)
 		return -1;		//out of screen
@@ -591,15 +678,82 @@ int prepare_poly(t_poly *p_poly, t_obj *object, t_point3d *p_lightpos, t_drawpol
 
 }
 
-int backface_culling(t_poly *p_poly, t_point3d *p_points3d)
+int prepare_poly(t_poly* p_poly, t_obj* object, t_point3d* p_lightpos, t_drawpoly* draw_data)
+//return value
+//0: must be drawn
+{
+	//transformed and valid 2d points are available
+	//lines using invalid points must be clipped
+
+	int polys2d;
+
+	//here will be 
+#define MAXPOLY 10	//due to near plane clipping, one poly can become more
+	t_point2d_tf tmp_points_2d[3 * MAXPOLY];
+
+	if (backface_culling(p_poly, object->points_3d) != 0)
+		return -1;		//not visible
+
+	/*
+	if (backface_culling_NEW_BAD(p_poly, object->points_3d_prep) != 0)
+		return -1;		//not visible
+	*/
+	
+	
+
+	/*
+	if ((polys2d = transform_to_2d_and_clip_to_near_plane(p_poly, object->points_3d_prep, tmp_points_2d)) == 0)
+		return -1;		//out of screen
+	*/
+	if (set_screen_coords(p_poly, object->points_2d_tf, draw_data) != 0)
+		return -1;		//out of screen
+
+						//fade colors based on screen direction
+	set_color(p_poly, object->points_3d, p_lightpos, draw_data);
+
+	return 0;
+
+}
+
+
+int transform_to_2d_and_clip_to_near_plane(t_poly* p_poly, t_point3d* p_points3d_prep, t_point2d_tf* savepoints)
+{
+	//returns number of transformed 2d polys created
+	//find out how many points of the poly have negative z (intersect viewing plane - which shound not be at zero z)
+	int numpolys = 0;
+
+
+	return 0;
+}
+
+int backface_culling(t_poly* p_poly, t_point3d* p_points3d)
 {
 	t_vector vect2poly;
 	double dotprod;
 
 	//camera to face vector (no need to find center of the polygon, so first point is OK)
-	vect2poly.vx = p_points3d[p_poly->point_id[0]].x - (int)camera.x;
-	vect2poly.vy = p_points3d[p_poly->point_id[0]].y - (int)camera.y;
-	vect2poly.vz = p_points3d[p_poly->point_id[0]].z - (int)camera.z;
+	vect2poly.vx = p_points3d[p_poly->point_id[0]].x - camera.x;
+	vect2poly.vy = p_points3d[p_poly->point_id[0]].y - camera.y;
+	vect2poly.vz = p_points3d[p_poly->point_id[0]].z - camera.z;
+
+	//get dot product
+	dotprod = vector_dotprod(vect2poly, p_poly->uvect_normal);
+
+	//return visibility
+	return (dotprod > 0.0f) ? 1 : 0;
+}
+
+
+int backface_culling_NEW_BAD(t_poly* p_poly, t_point3d* p_points3d)
+//uses points3d_prep
+{
+	t_vector vect2poly;
+	double dotprod;
+
+	//camera to face vector (no need to find center of the polygon, so first point is OK)
+	vect2poly.vx = p_points3d[p_poly->point_id[0]].x;
+	vect2poly.vy = p_points3d[p_poly->point_id[0]].y;
+	vect2poly.vz = p_points3d[p_poly->point_id[0]].z;
 
 	//get dot product
 	dotprod = vector_dotprod(vect2poly, p_poly->uvect_normal);
@@ -610,8 +764,7 @@ int backface_culling(t_poly *p_poly, t_point3d *p_points3d)
 
 
 
-
-int set_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_drawpoly *p_draw_data)
+int set_screen_coords(t_poly* p_poly, t_point2d_tf* p_points2d_tf, t_drawpoly* p_draw_data)
 //translate transformed 2d coordinates to screen cordinates (0 <= x < screen_res_x and 0 <= y < screen_res_y)
 //also check if poly is within field of vision
 {
@@ -670,25 +823,26 @@ int set_screen_coords(t_poly *p_poly, t_point2d_tf *p_points2d_tf, t_drawpoly *p
 
 
 
-void set_color(t_poly *p_poly, t_point3d *p_points3d, t_point3d *p_lightpos, t_drawpoly *p_draw_data)
+void set_color(t_poly* p_poly, t_point3d* p_points3d, t_point3d* p_lightpos, t_drawpoly* p_draw_data)
 {
 
 	t_vector vect2poly;
 	double dotprod;
 	float lightmag;
 
-	//test - don't change original color
 	/*
+	//test - don't change original color
 	p_draw_data->color.r = p_poly->color.r;
 	p_draw_data->color.g = p_poly->color.g;
 	p_draw_data->color.b = p_poly->color.b;
 	return;
 	*/
+
 	if (rend_drawmode == DM_FLATS) {
 		//camera to face vector (no need to find center of the polygon, so first point is OK)
-		vect2poly.vx = p_points3d[p_poly->point_id[0]].x - p_lightpos->x;
-		vect2poly.vy = p_points3d[p_poly->point_id[0]].y - p_lightpos->y;
-		vect2poly.vz = p_points3d[p_poly->point_id[0]].z - p_lightpos->z;
+		vect2poly.vx = p_points3d[p_poly->point_id[0]].x - (double)p_lightpos->x;
+		vect2poly.vy = p_points3d[p_poly->point_id[0]].y - (double)p_lightpos->y;
+		vect2poly.vz = p_points3d[p_poly->point_id[0]].z - (double)p_lightpos->z;
 		vect2poly = vector_unitize(vect2poly);
 
 		//get dot product
@@ -711,22 +865,22 @@ void set_color(t_poly *p_poly, t_point3d *p_points3d, t_point3d *p_lightpos, t_d
 
 
 
-int cmpfunc(const void * a, const void * b) {
+int cmpfunc(const void* a, const void* b) {
 	//this function belongs to qsort
-	t_drawpoly *polyA = (t_drawpoly *)a;
-	t_drawpoly *polyB = (t_drawpoly *)b;
+	t_drawpoly* polyA = (t_drawpoly*)a;
+	t_drawpoly* polyB = (t_drawpoly*)b;
 	return (polyB->zdist - polyA->zdist);
 }
 
-void sort_dpolys(t_drawpoly *p_draw_array, int count)
+void sort_dpolys(t_drawpoly* p_draw_array, int count)
 {
 	qsort(p_draw_array, count, sizeof(t_drawpoly), cmpfunc);
-	if (0 && (dbg_global == true)) {
+	if (0 && (dbg_global == SDL_TRUE)) {
 		printf("sort_dpolys | glb_polycount=%d\n", count);
 	}
 }
 
-void draw_dpolys(t_drawpoly *p_draw_array, int count)
+void draw_dpolys(t_drawpoly* p_draw_array, int count)
 {
 	int i;
 
@@ -735,7 +889,7 @@ void draw_dpolys(t_drawpoly *p_draw_array, int count)
 			drawpoly_fill(p_draw_array);
 		else
 			drawpoly_wire(p_draw_array);
-		if (0 && dbg_global == true) {
+		if (0 && dbg_global == SDL_TRUE) {
 			printf("draw_dpolys | p_draw %d (%d,%d), (%d,%d), (%d,%d)\n", i, p_draw_array->points[0].x, p_draw_array->points[0].y, p_draw_array->points[1].x, p_draw_array->points[1].y, p_draw_array->points[2].x, p_draw_array->points[2].y);
 		}
 		p_draw_array++;
@@ -743,7 +897,7 @@ void draw_dpolys(t_drawpoly *p_draw_array, int count)
 }
 
 
-void drawpoly_wire(t_drawpoly *draw)
+void drawpoly_wire(t_drawpoly* draw)
 {
 	SDL_Point p_ord[3] = { 0 };	//*not ordered :)
 
@@ -757,13 +911,13 @@ void drawpoly_wire(t_drawpoly *draw)
 }
 
 //testing
-void drawline_pixelmem_BAD_DONT_USE_IT(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color)
+void drawline_pixelmem_BAD_DONT_USE_IT(Uint32* pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color)
 {
 	int i;
 	int xdiff = point_b.x - point_a.x;
 	int ydiff = point_b.y - point_a.y;
-	Uint32 *pm1;// = pixelmem + (point_a.y * screen_res_x) + point_a.x;
-	bool oos = false;	//true if line is partly out of screen
+	Uint32* pm1;// = pixelmem + (point_a.y * screen_res_x) + point_a.x;
+	SDL_bool oos = SDL_FALSE;	//true if line is partly out of screen
 
 	//testing stuff
 	int diff_count;
@@ -784,7 +938,7 @@ void drawline_pixelmem_BAD_DONT_USE_IT(Uint32 *pixelmem, SDL_Point point_a, SDL_
 		return;
 
 	if (xdiff_abs >= ydiff_abs) {
-	//we go on "x" axis in the cycle
+		//we go on "x" axis in the cycle
 		diff_count = xdiff_abs;
 		cycle_add_constant /*= cycle_add_x*/ = sign(xdiff);
 		cycle_add_conditional = sign(ydiff) * screen_res_x;
@@ -793,7 +947,7 @@ void drawline_pixelmem_BAD_DONT_USE_IT(Uint32 *pixelmem, SDL_Point point_a, SDL_
 		//going_on = 1;
 	}
 	else {
-	//we go on "y" axis in the cycle
+		//we go on "y" axis in the cycle
 		diff_count = ydiff_abs;
 		cycle_add_constant = sign(ydiff) * screen_res_x;
 		//cycle_add_y = sign(ydiff);
@@ -804,13 +958,13 @@ void drawline_pixelmem_BAD_DONT_USE_IT(Uint32 *pixelmem, SDL_Point point_a, SDL_
 
 
 	if (point_a.x < 0 || point_a.y < 0 || point_a.x >= screen_res_x || point_a.y >= screen_res_y)
-		oos = true;
+		oos = SDL_TRUE;
 	if (point_b.x < 0 || point_b.y < 0 || point_b.x >= screen_res_x || point_b.y >= screen_res_y)
-		oos = true;
+		oos = SDL_TRUE;
 
 
 
-	if (oos == true) {
+	if (oos == SDL_TRUE) {
 		/*
 		for (i = 0; i < diff_count; i++) {
 			pm1 = pixelmem + puthere;
@@ -847,7 +1001,7 @@ void drawline_pixelmem_BAD_DONT_USE_IT(Uint32 *pixelmem, SDL_Point point_a, SDL_
 }
 
 
-void drawline_pixelmem(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color)
+void drawline_pixelmem(Uint32* pixelmem, SDL_Point point_a, SDL_Point point_b, SDL_Color color)
 {
 	int i;
 	int xdiff = point_b.x - point_a.x;
@@ -857,17 +1011,17 @@ void drawline_pixelmem(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, S
 	int diff_count = ((abs(xdiff) - abs(ydiff)) >= 0) ? abs(xdiff) : abs(ydiff);	//cycle counter
 	float xadd = (float)xdiff / (float)diff_count;
 	float yadd = (float)ydiff / (float)diff_count;
-	Uint32 *pm1;// = pixelmem + (point_a.y * screen_res_x) + point_a.x;
-	
-	bool oos = false;	//true if line is partly out of screen
-	
+	Uint32* pm1;// = pixelmem + (point_a.y * screen_res_x) + point_a.x;
+
+	SDL_bool oos = SDL_FALSE;	//true if line is partly out of screen
+
 	if (point_a.x < 0 || point_a.y < 0 || point_a.x >= screen_res_x || point_a.y >= screen_res_y)
-		oos = true;
+		oos = SDL_TRUE;
 	if (point_b.x < 0 || point_b.y < 0 || point_b.x >= screen_res_x || point_b.y >= screen_res_y)
-		oos = true;
-	
-	if (oos == true) {
-		
+		oos = SDL_TRUE;
+
+	if (oos == SDL_TRUE) {
+
 		for (i = 0; i < diff_count; i++) {
 			pm1 = pixelmem + ((int)yfloat * screen_res_x) + (int)xfloat;
 			if (sign((int)yfloat) >= 0 && sign((int)xfloat) >= 0 && xfloat < (float)screen_res_x && yfloat < (float)screen_res_y)
@@ -875,7 +1029,7 @@ void drawline_pixelmem(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, S
 			xfloat += xadd;
 			yfloat += yadd;
 		}
-		
+
 	}
 	else {
 		for (i = 0; i < diff_count; i++) {
@@ -885,27 +1039,27 @@ void drawline_pixelmem(Uint32 *pixelmem, SDL_Point point_a, SDL_Point point_b, S
 			yfloat += yadd;
 		}
 	}
-	
+
 }
 
 
 
-void drawpoly_fill(t_drawpoly *draw)
+void drawpoly_fill(t_drawpoly* draw)
 //flat color draw
 {
 	SDL_Point p_ord[3] = { 0 };
 	SDL_Point p_tmp;
 	int i, j = 0;
 	int ymin = 0;
-	SDL_Point *line1;
-	SDL_Point *line2;
+	SDL_Point* line1;
+	SDL_Point* line2;
 	int ymax;
 
 	//set color
 	SDL_SetRenderDrawColor(renderer, draw->color.r, draw->color.g, draw->color.b, draw->color.a);
 	memcpy(p_ord, draw->points, sizeof(SDL_Point) * 3);
 
-	if (0 && dbg_global == true) {
+	if (0 && dbg_global == SDL_TRUE) {
 		printf("point ORIG:(%d,%d), point b:(%d,%d), point c:(%d,%d), ymax %d\n", p_ord[0].x, p_ord[0].y, p_ord[1].x, p_ord[1].y, p_ord[2].x, p_ord[2].y, ymax);
 	}
 
@@ -928,7 +1082,7 @@ void drawpoly_fill(t_drawpoly *draw)
 	}
 
 	ymax = p_ord[2].y - p_ord[0].y;
-	if (0 && dbg_global == true) {
+	if (0 && dbg_global == SDL_TRUE) {
 		printf("point SORT:(%d,%d), point b:(%d,%d), point c:(%d,%d), ymax %d\n", p_ord[0].x, p_ord[0].y, p_ord[1].x, p_ord[1].y, p_ord[2].x, p_ord[2].y, ymax);
 	}
 
@@ -937,8 +1091,8 @@ void drawpoly_fill(t_drawpoly *draw)
 	if (ymax > (screen_res_y * 10))
 		return;
 
-	line1 = (SDL_Point *)malloc((ymax + 2) * sizeof(SDL_Point));
-	line2 = (SDL_Point *)malloc((ymax + 2) * sizeof(SDL_Point));
+	line1 = (SDL_Point*)malloc((ymax + 2) * sizeof(SDL_Point));
+	line2 = (SDL_Point*)malloc((ymax + 2) * sizeof(SDL_Point));
 	if (line1 == NULL || line2 == NULL) {
 		printf("drawpoly_fill malloc failed! ymax=%d\n", ymax);
 		if (line1)
@@ -964,12 +1118,12 @@ void drawpoly_fill(t_drawpoly *draw)
 		for (i = 0; i < ydiff; i++) {
 			tmpoints[0] = line1[i];
 			tmpoints[1] = line2[i];
-			if (0 && dbg_global == true) {
+			if (0 && dbg_global == SDL_TRUE) {
 				printf("line drawing | point a:(%d,%d), point b:(%d,%d)\n", tmpoints[0].x, tmpoints[0].y, tmpoints[1].x, tmpoints[1].y);
 			}
 			draw_horizontal_line(pixels, draw->color, tmpoints);
 		}
-		if (0 && dbg_global == true)
+		if (0 && dbg_global == SDL_TRUE)
 			printf("\n");
 	}
 
@@ -981,13 +1135,13 @@ void drawpoly_fill(t_drawpoly *draw)
 	return;
 }
 
-void draw_horizontal_line(Uint32 *pixelmem, SDL_Color color, SDL_Point *points)
+void draw_horizontal_line(Uint32* pixelmem, SDL_Color color, SDL_Point* points)
 {
 	int i;
 	int tmpx1;
 	int tmpx2;
 	int cnt;			//points to draw
-	Uint32 *u32mem = pixelmem;
+	Uint32* u32mem = pixelmem;
 
 	//exit if y is out of screen
 	if (points[0].y < 0 || points[0].y >= screen_res_y)
@@ -1015,14 +1169,14 @@ void draw_horizontal_line(Uint32 *pixelmem, SDL_Color color, SDL_Point *points)
 	cnt = abs(tmpx2 - tmpx1);
 
 	//fill memory
-	u32mem = pixelmem + points[0].y*screen_res_x + tmpx1;
+	u32mem = pixelmem + points[0].y * screen_res_x + tmpx1;
 	for (i = 0; i < cnt; i++) {
 		memcpy(u32mem++, &color, sizeof(Uint32));
 	}
 
 }
 
-int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point *memloc)
+int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point* memloc)
 {
 	int i = 0;
 	int a = 0;	//from
@@ -1041,21 +1195,21 @@ int draw_memline(SDL_Point point_a, SDL_Point point_b, SDL_Point *memloc)
 		return 1;
 	}
 
-	if (0 && dbg_global == true)
+	if (0 && dbg_global == SDL_TRUE)
 		printf("memline | point a:(%d,%d), point b:(%d,%d) | xdiff=%d, ydiff=%d, xadd=%f\n", point_a.x, point_a.y, point_b.x, point_b.y, xdiff, ydiff, xadd);
 
-	if (0 && dbg_global == true)
+	if (0 && dbg_global == SDL_TRUE)
 		printf("memline | memloc x=%d,y=%d\n", memloc->x, memloc->y);
 
-	for (i = 1; i <= ydiff; i++) {	//0 esetén (ha a két y megegyezik) nem rajzol - egyelöre
+	for (i = 1; i <= ydiff; i++) {	//0 esetï¿½n (ha a kï¿½t y megegyezik) nem rajzol - egyelï¿½re
 		(memloc + i)->y = (memloc + i - 1)->y + 1;
 		xfloat = xfloat + xadd;
 		(memloc + i)->x = (int)(roundf(xfloat));
-		if (0 && dbg_global == true)
+		if (0 && dbg_global == SDL_TRUE)
 			printf("memline inner | (memloc + i)x=%d,y=%d\n", (memloc + i)->x, (memloc + i)->y);
 	}
 
-	if (0 && dbg_global == true)
+	if (0 && dbg_global == SDL_TRUE)
 		printf("memline return %d\n", i);
 	return i;
 }
@@ -1109,9 +1263,10 @@ int create_lot_objs_v2(void)
 	int i, k;
 
 	//v2
-	t_point3d *p_obj_points_3d;
-	t_point2d_tf *p_obj_points_2d;
-	t_poly *p_obj_polys;
+	t_point3d* p_obj_points_3d;
+	t_point3d* p_obj_points_3d_prep;
+	t_point2d_tf* p_obj_points_2d;
+	t_poly* p_obj_polys;
 	//t_poly *cube_polyconns;
 	int num_objects = 1;
 	int rand_x, rand_y, rand_z;
@@ -1128,13 +1283,18 @@ int create_lot_objs_v2(void)
 		objs[k].num_polys = objs[0].num_polys;
 		objs[k].polys = obj_polys;	//global stuff
 		objs[k].points_2d_tf = obj_points_2d;
-		p_obj_points_3d = (t_point3d *)malloc(points_num * sizeof(t_point3d));
-		p_obj_points_2d = (t_point2d_tf *)malloc(points_num * sizeof(t_point2d_tf));
-		p_obj_polys = (t_poly *)malloc(polys_num * sizeof(t_poly));
-		if (p_obj_points_3d == NULL || p_obj_points_2d == NULL || p_obj_polys == NULL)
+		p_obj_points_3d = (t_point3d*)malloc(points_num * sizeof(t_point3d));
+		p_obj_points_3d_prep = (t_point3d*)malloc(points_num * sizeof(t_point3d));
+		p_obj_points_2d = (t_point2d_tf*)malloc(points_num * sizeof(t_point2d_tf));
+		p_obj_polys = (t_poly*)malloc(polys_num * sizeof(t_poly));
+		if (p_obj_points_3d == NULL || p_obj_points_3d_prep == NULL || p_obj_points_2d == NULL || p_obj_polys == NULL) {
+			printf("*** %s; malloc error\n", __func__);
 			return -1;
+		}
+		memset(p_obj_points_3d_prep, 0x00, points_num * sizeof(t_point3d));
 		objs[k].points_2d_tf = p_obj_points_2d;
 		objs[k].points_3d = p_obj_points_3d;
+		objs[k].points_3d_prep = p_obj_points_3d_prep;
 		objs[k].polys = p_obj_polys;
 		memcpy(objs[k].polys, objs[0].polys, polys_num * sizeof(t_poly));
 		rand_x = rand() % MAXDISTANCE_V2;
@@ -1154,7 +1314,7 @@ int create_lot_objs_v2(void)
 		tmpcol.b = rand_c + 50;
 		tmpcol.a = 255;
 		for (i = 0; i < objs[k].num_polys; i++) {
-			objs[k].polys[i].color = tmpcol;
+			memcpy(&objs[k].polys[i].color, &tmpcol, sizeof(SDL_Color));	//had warning: objs[k].polys[i].color = tmpcol;
 		}
 	}
 
