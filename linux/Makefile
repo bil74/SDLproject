@@ -3,17 +3,17 @@
 #and may not be redistributed without written permission.
 
 #OBJS specifies which files to compile as part of the project
-OBJS = control.cpp display.cpp main.cpp movement.cpp render.cpp timer.cpp utils.cpp config.cpp
+OBJS = control.c display.c main.c movement.c render.c timer.c utils.c config.c
 
 #CC specifies which compiler we're using
-CC = g++
+CC = gcc
 
 #COMPILER_FLAGS specifies the additional compilation options we're using
 # -w suppresses all warnings
 COMPILER_FLAGS = -O3 -Wall -D_LINUX_ -I.
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lSDL2 -lSDL2_ttf
+LINKER_FLAGS = -lSDL2 -lSDL2_ttf -lm
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = sdlproject
