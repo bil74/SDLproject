@@ -25,7 +25,7 @@ typedef struct {
 	double cz;
 	double sz;
 
-	double curr_segment_3d;		//felosztjuk a teret kockákra és csak az akuális plusz szomszédos szegmenseket rajzoljuk meg
+	double curr_segment_3d;		//TODO: felosztjuk a teret kockakra es csak az akualis plusz szomszedos szegmenseket rajzoljuk meg
 	t_vector uvect;	//unit vector
 	t_vector uvect_default;	//unit vector default
 }t_camera;
@@ -62,9 +62,9 @@ typedef struct {
 	int num_points;
 	int num_polys;
 	t_point3d *points_3d;
+	t_poly *polys;
 	t_point3d *points_3d_prep;
 	t_point2d_tf *points_2d_tf;
-	t_poly *polys;
 }t_obj;
 
 //scene v2
@@ -102,8 +102,8 @@ typedef struct {
 
 typedef struct {
 	int draw_it;	//visible or not
-	int relative;	//0: a koordináták abszolutak, 0: a poly koordinátákhoz hozzá kell adni az obj koordinátákat (+forgatás)
-					//int segment_3d;	//ez x,y,z koordináta lesz (pl. 10, 10, 10) es csak 9 db. szegmenst veszünk figyelembe renderelésnél
+	int relative;	//0: a koordinï¿½tï¿½k abszolutak, 0: a poly koordinï¿½tï¿½khoz hozzï¿½ kell adni az obj koordinï¿½tï¿½kat (+forgatï¿½s)
+					//int segment_3d;	//ez x,y,z koordinï¿½ta lesz (pl. 10, 10, 10) es csak 9 db. szegmenst veszï¿½nk figyelembe renderelï¿½snï¿½l
 	int obj_x;
 	int obj_y;
 	int obj_z;

@@ -1,6 +1,6 @@
 *.exe
 *.dll
 *.ttf
-config.txt
+*.txt
 !files/*
 !linux/*

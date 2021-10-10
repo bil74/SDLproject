@@ -1,6 +1,6 @@
-#ifndef _LINUX_
+#if defined(windows)
 #include <windows.h>
-#else
+#elif defined(linux)
 #include <time.h>
 #endif
 #include <stdio.h>
@@ -9,12 +9,12 @@
 #include "utils.h"
 
 
-#ifndef _LINUX_
+#if defined(windows)
 double PCFreq = 0.0;
 //#define GET_NANO 1.00
 #define GET_MICRO 1000000.0
 #define GET_MILLIS 1000.00
-#else
+#elif defined(linux)
 #define GET_NANO 1.00
 #define GET_MICRO 1000.00
 #define GET_MILLIS 1000000.00
@@ -23,25 +23,25 @@ struct timespec now;
 
 void InitTimer()
 {
-#ifndef _LINUX_
+#if defined(windows)
 	LARGE_INTEGER li;
 	if (!QueryPerformanceFrequency(&li)) {
 		printf("QueryPerformanceFrequency failed!\n");
 	}
 
 	PCFreq = (double)((li.QuadPart) / GET_MILLIS);		//millisec
-#else
+#elif defined(linux)
 #endif
 }
 
-#ifndef _LINUX_
+#if defined(windows)
 void StartCounter(INT64* i64_counter)
 {
 	LARGE_INTEGER li;
 	QueryPerformanceCounter(&li);
 	*i64_counter = li.QuadPart;
 }
-#else
+#elif defined(linux)
 void StartCounter(INT64* i64_counter)
 {
 	clock_gettime(CLOCK_MONOTONIC_RAW, &now);
@@ -49,14 +49,14 @@ void StartCounter(INT64* i64_counter)
 }
 #endif
 
-#ifndef _LINUX_
+#if defined(windows)
 double GetCounter(INT64* i64_counter)
 {
 	LARGE_INTEGER li;
 	QueryPerformanceCounter(&li);
 	return (double)((li.QuadPart - *i64_counter) / PCFreq);
 }
-#else
+#elif defined(linux)
 double GetCounter(INT64* i64_counter)
 {
 	clock_gettime(CLOCK_MONOTONIC_RAW, &now);

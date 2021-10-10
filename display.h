@@ -1,9 +1,9 @@
 #ifndef _SDLPARTS_H_
 #define _SDLPARTS_H_
-#ifndef _LINUX_
+#if defined(windows)
 #include <SDL.h>
 #include <SDL_TTF.h>
-#else
+#elif defined(linux)
 //#include <SDL/SDL.h>
 //#include <SDL2/SDL_ttf.h>
 #include </usr/include/SDL2/SDL.h>

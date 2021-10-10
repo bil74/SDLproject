@@ -1,7 +1,7 @@
-#ifndef _LINUX_
+#if defined(windows)
 #include <windows.h>
 #include <SDL.h>
-#else
+#elif defined(linux)
 #include </usr/include/SDL2/SDL.h>
 #endif
 #include <stdio.h>

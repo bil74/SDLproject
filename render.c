@@ -1,9 +1,10 @@
-#ifndef _LINUX_
+#include "utils.h"
+#if defined(windows)
 //using namespace std;
 //#include <iostream>
 #include <windows.h>
 #include <SDL.h>
-#else
+#elif defined(linux)
 #include <unistd.h>
 //#include <SDL/SDL.h>
 #include </usr/include/SDL2/SDL.h>
@@ -17,7 +18,6 @@
 #include "timer.h"
 #include "display.h"
 #include "render.h"
-#include "utils.h"
 #include "control.h"
 #include "config.h"
 
@@ -68,7 +68,7 @@ t_poly obj_polys[] = {
 };
 
 t_obj objs[OBJS_V2] = {
-	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_3d_prep, obj_points_2d, obj_polys }
+	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_polys,  obj_points_3d_prep, obj_points_2d }
 };
 t_scene scene = {
 	{ -1000, -1000, -1000 },
@@ -245,7 +245,7 @@ t_poly obj_polys[] = {
 };
 
 t_obj objs[OBJS_V2] = {
-	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_3d_prep, obj_points_2d, obj_polys }
+	{ ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_polys,  obj_points_3d_prep, obj_points_2d }
 };
 t_scene scene = {
 	{ -1000,-1000,-1000 },
@@ -278,7 +278,7 @@ t_poly obj_polys[] = { { 0,1,2 ,{255,255,255,0},0, {0,0,0}}, { 2,3,0 ,{ 255,255,
 
 t_obj objs[OBJS_V2] = {
 //{ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_2d, obj_polys}
-	{ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_points_3d_prep, obj_points_2d, obj_polys}
+	{ARRAY_SIZE(obj_points_3d), ARRAY_SIZE(obj_polys), obj_points_3d, obj_polys, obj_points_3d_prep, obj_points_2d}
 };
 
 t_scene scene = {

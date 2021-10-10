@@ -1,15 +1,18 @@
-#ifndef _LINUX_
+#include "utils.h"
+
+#if defined(windows)
 //using namespace std;
 //#include <iostream>
 #include <windows.h>
 #include <SDL.h>
-#else
+#elif defined(linux)
 #include </usr/include/SDL2/SDL.h>
 #include </usr/include/SDL2/SDL_ttf.h>
 #include <unistd.h>
 //#include <SDL/SDL.h>
 #include <inttypes.h>
 #endif
+
 #include "control.h"
 
 //control method
