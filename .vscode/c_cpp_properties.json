@@ -60,11 +60,12 @@
             ],
             "compileCommands": "${default}",
             "browse": {
-                "limitSymbolsToIncludedHeaders": true,
+                "limitSymbolsToIncludedHeaders": false,
                 "databaseFilename": "${default}",
                 "path": [
                     //"additional/paths",
-                    "${default}"
+                    "${default}",
+                    "${workspaceFolder}"
                 ]
             },
             "intelliSenseMode": "${default}",
