@@ -1,12 +1,12 @@
-#ifndef _LINUX_
-#include <SDL.h>
-#else
-#include </usr/include/SDL2/SDL.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
+#if defined(windows)
+#include <SDL.h>
+#elif defined(linux)
+#include </usr/include/SDL2/SDL.h>
+#endif
 #include "config.h"
 
 struct config_item {

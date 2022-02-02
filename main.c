@@ -1,25 +1,24 @@
-#ifndef _LINUX_
-//using namespace std;
-//#include <iostream>
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+#include "utils.h"
+
+#if defined(windows)
 #include <windows.h>
 #include <SDL.h>
-#else
+#elif defined(linux)
 #include <unistd.h>
 //#include <SDL/SDL.h>
 #include </usr/include/SDL2/SDL.h>
 #include </usr/include/SDL2/SDL_ttf.h>
 #include <inttypes.h>
 #endif
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
 #include "main.h"
 #include "timer.h"
 #include "display.h"
 #include "render.h"
 #include "control.h"
 #include "movement.h"
-#include "utils.h"
 #include "config.h"
 
 

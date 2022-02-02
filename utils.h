@@ -1,9 +1,14 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-#ifndef _LINUX_
+#if defined(WIN32) || defined(WIN64)
+#define windows 1
+#endif
+
+#if defined(windows)
+#include <windows.h>
 #define INT64 __int64
-#else
+#elif defined(linux)
 #define INT64 int64_t
 #endif
 
@@ -14,7 +19,7 @@ extern int sign(int x);
 
 
 
-#ifdef _LINUX_
+#ifdef linux
 #define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),(mode)))==NULL
 //#define sprintf_s(str, strsiz, format, ...) sprintf(str, format, __VA_ARGS__)
 #endif
